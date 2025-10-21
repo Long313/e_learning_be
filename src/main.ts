@@ -18,7 +18,7 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true }, // Giữ token khi reload
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 4000);
   console.log(`🚀 Server đang chạy tại: http://localhost:${process.env.PORT ?? 4000}`);
   console.log(`📘 Swagger docs: http://localhost:${process.env.PORT ?? 4000}/api/docs`);
 }
