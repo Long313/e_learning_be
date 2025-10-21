@@ -21,14 +21,14 @@
         # App
         PORT=4000
 
-        # MySQL
-        DB_HOST=mysql
-        DB_PORT=3306
+        # PostgreSQL
+        DB_HOST=postgres
+        DB_PORT=5432
         DB_USERNAME=admin
         DB_PASSWORD=password
         DB_DATABASE=elearningdb
 
-        # Redis
+        # Redis (nếu dùng)
         REDIS_HOST=redis
         REDIS_PORT=6379
 
@@ -38,9 +38,9 @@
         # App
         PORT=4000
 
-        # MySQL
+        # PostgreSQL
         DB_HOST=localhost
-        DB_PORT=3306
+        DB_PORT=5432
         DB_USERNAME=admin
         DB_PASSWORD=password
         DB_DATABASE=elearningdb
