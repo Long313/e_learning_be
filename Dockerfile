@@ -31,7 +31,7 @@ RUN npm ci --only=production
 # Copy build từ stage builder
 COPY --from=builder /app/dist ./dist
 COPY ormconfig.js ./ 
-COPY .env ./ 
+# COPY .env ./ 
 
 # Copy script wait-for-it để chờ MySQL
 COPY wait-for-it.sh /wait-for-it.sh
