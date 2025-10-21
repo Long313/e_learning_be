@@ -3,7 +3,7 @@
 
 ## Tech stack:
   - Server: Nestjs (TypeORM + Typescript), Docker (docker-compose.yml + Dockerfile)
-  - Database: + MySQL v8.0
+  - Database: + Postgres v8.11.0
               + Redis v7.0
   - Swagger
 

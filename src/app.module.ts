@@ -7,7 +7,7 @@ import { User } from './user/user.entity';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: 'postgres', // thay mysql -> postgres
+      type: 'postgres',
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT) || 5432,
       username: process.env.DB_USERNAME,
