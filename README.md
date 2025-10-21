@@ -8,10 +8,51 @@
   - Swagger
 
 ## Hướng dẫn chạy project:
-  1. Tải Docker Desktop
-  2. tạo 2 file docker-compose.yml và Dockerfile
-  3. Chạy lệnh: docker-compose up --build
-  4. Chạy npm run start:dev 
+  * Chạy bằng Docker:
+    1. Tải Docker Desktop
+    2. Tạo 2 file docker-compose.yml và Dockerfile
+    3. Chạy lệnh: docker-compose up --build 
+  ------------------------------------------------
+  * Không cần chạy Docker thì:
+    1. Sửa file .env 
+
+    Sửa từ
+    -----------------------
+        # App
+        PORT=4000
+
+        # MySQL
+        DB_HOST=mysql
+        DB_PORT=3306
+        DB_USERNAME=admin
+        DB_PASSWORD=password
+        DB_DATABASE=elearningdb
+
+        # Redis
+        REDIS_HOST=redis
+        REDIS_PORT=6379
+
+    -----------------------
+    thành
+    -----------------------
+        # App
+        PORT=4000
+
+        # MySQL
+        DB_HOST=localhost
+        DB_PORT=3306
+        DB_USERNAME=admin
+        DB_PASSWORD=password
+        DB_DATABASE=elearningdb
+
+        # Redis
+        REDIS_HOST=localhost
+        REDIS_PORT=6379
+    ------------------------
+    2. npm run start:dev
+  
+## Một số câu lệnh hay dùng
+  docker-compose down -v (xoá container và volume MySQL hiện tại)
 _______________________________________________________________________________________________
 
 ## Project setup

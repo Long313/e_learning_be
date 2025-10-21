@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { User } from './user/user.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ConfigModule } from '@nestjs/config';
       retryAttempts: 10,
       retryDelay: 3000,
       logging: true,
-    })
+    }),
+    TypeOrmModule.forFeature([User]),
   ],
 })
 export class AppModule { }
