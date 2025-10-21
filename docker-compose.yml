@@ -9,7 +9,7 @@ services:
       - "${PORT:-4000}:4000"
     depends_on:
       - mysql
-      - redis
+      # - redis
     networks:
       - app-net
 
@@ -22,25 +22,25 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
       - app-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - app-net
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - app-net
 
 volumes:
   mysql-data:
-  redis-data:
+  # redis-data:
 
 networks:
   app-net:
