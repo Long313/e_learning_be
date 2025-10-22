@@ -1,25 +1,39 @@
-## Phiên bản Node:
-  Node v20.18.0
+#  🧰 Project: E-Learning Backend
 
-## Tech stack:
-  - Server: Nestjs (TypeORM + Typescript), Docker (docker-compose.yml + Dockerfile)
-  - Database: + Postgres v8.11.0
-              + Redis v7.0
-  - Swagger
+## 🧩 Phiên bản Node:
+    Node v20.18.0
 
-## Hướng dẫn chạy project:
-  * Chạy bằng Docker:
-    1. Tải Docker Desktop
+## 💡Công nghệ sử dụng:
+ 🔹 Server: Nestjs (TypeORM + Typescript), Docker (docker-compose.yml + Dockerfile)
+ 🔹 Database: Postgres v.15.x (Docker)
+ 🔹 Swagger
+
+
+## ⚙️ Hướng dẫn chạy project:
+ 🔹 Chạy bằng Docker:
+    1. Tải Docker Desktop https://www.docker.com/products/docker-desktop/
     2. Tạo 2 file docker-compose.yml và Dockerfile
     3. Chạy lệnh: docker-compose up --build 
   ------------------------------------------------
-  * Chạy bình thường
-    2. npm run start:dev
-  
-## Một số câu lệnh hay dùng
-  docker-compose down -v (xoá container và volume MySQL hiện tại)
-  docker-compose --env-file .env.docker down -v
-_______________________________________________________________________________________________
+ 🔹 Chạy thủ công (local)
+    1. npm install
+    2. Kết nối với Postgres (thông tin database ở file .env)
+    3. npm run start:dev
+
+## 🚀 Một số câu lệnh hay dùng
+ 🔹 docker-compose down -v (nếu muốn dừng và xóa toàn bộ container + volume:)
+ 🔹 docker-compose --env-file .env.docker down -v (hoặc nếu đang dùng file môi trường riêng)
+
+## 🌐 Link server test:
+ 🔹 Backend Server 🔗: https://e-learning-be-i5i4.onrender.com/api/docs
+ 🔹 Database Server 🔗: postgresql:admin:tlpDdElvtmk0oLGLShXvoa5lf6yaBqJh@dpg-d3s8tsq4d50c738knbpg-a.        oregon-postgres.render.com/elearningdb_4jt1
+ 🔹 Frontend Server 🔗: https://e-learning-fe-phi.vercel.app/
+
+## 🧾Lưu ý:
+   .env: Chạy project ở local, nếu không chạy bằng Docker
+   .env.docker: Nếu chạy project bằng Docker ở local
+   .env.prod: Để deploy bằng Docker
+_____________________________________________________________________________________________
 
 ## Project setup
 
@@ -54,17 +68,5 @@ $ npm run test:cov
 ```
 _______________________________________________________________________________________________
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
 
