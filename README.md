@@ -13,46 +13,12 @@
     2. Tạo 2 file docker-compose.yml và Dockerfile
     3. Chạy lệnh: docker-compose up --build 
   ------------------------------------------------
-  * Không cần chạy Docker thì:
-    1. Sửa file .env 
-
-    Sửa từ
-    --------------------------
-        # App
-        PORT=4000
-
-        # PostgreSQL
-        DB_HOST=postgres
-        DB_PORT=5432
-        DB_USERNAME=admin
-        DB_PASSWORD=password
-        DB_DATABASE=elearningdb
-
-        # Redis (nếu dùng)
-        REDIS_HOST=redis
-        REDIS_PORT=6379
-
-    -------------------------
-    thành
-    -----------------------
-        # App
-        PORT=4000
-
-        # PostgreSQL
-        DB_HOST=localhost
-        DB_PORT=5432
-        DB_USERNAME=admin
-        DB_PASSWORD=password
-        DB_DATABASE=elearningdb
-
-        # Redis
-        REDIS_HOST=localhost
-        REDIS_PORT=6379
-    ------------------------
+  * Chạy bình thường
     2. npm run start:dev
   
 ## Một số câu lệnh hay dùng
   docker-compose down -v (xoá container và volume MySQL hiện tại)
+  docker-compose --env-file .env.docker down -v
 _______________________________________________________________________________________________
 
 ## Project setup
