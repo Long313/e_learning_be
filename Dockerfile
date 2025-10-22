@@ -1,13 +1,12 @@
 # --- Build stage ---
 FROM node:20.18.0-alpine AS builder
-
 WORKDIR /app
 
-# Copy package.json và cài dependencies
+# Copy package và cài dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install          # install tất cả, đảm bảo pg có trong dependencies
 
-# Copy config và source code
+# Copy source
 COPY tsconfig.json ./ 
 COPY ormconfig.js ./ 
 COPY src ./src
@@ -17,27 +16,24 @@ RUN npm run build
 
 # --- Production stage ---
 FROM node:20.18.0-alpine
-
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Cài bash vì wait-for-it.sh yêu cầu bash
-RUN apk add --no-cache bash
+# Cài thêm bash + PostgreSQL client
+RUN apk add --no-cache bash postgresql-client
 
-# Copy production dependencies
+# Copy package và cài dependencies production
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Copy build từ stage builder
+# Copy build từ builder
 COPY --from=builder /app/dist ./dist
 COPY ormconfig.js ./ 
-# COPY .env ./ 
-
-# Copy script wait-for-it để chờ MySQL
 COPY wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
+# Expose port
 EXPOSE 3000
 
-# CMD: chạy wait-for-it bằng bash, rồi start app
-CMD ["bash", "/wait-for-it.sh", "mysql:3306", "--", "node", "dist/main.js"]
+# CMD: chờ Postgres sẵn sàng rồi start NestJS
+CMD ["bash", "/wait-for-it.sh", "postgres:5432", "--", "node", "dist/main.js"]

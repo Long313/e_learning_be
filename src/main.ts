@@ -17,7 +17,12 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: { persistAuthorization: true }, // Giữ token khi reload
   });
-
+  console.log('DB CONFIG:', {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USERNAME,
+    db: process.env.DB_DATABASE,
+  });
   await app.listen(process.env.PORT ?? 4000);
   console.log(`🚀 Server đang chạy tại: http://localhost:${process.env.PORT ?? 4000}`);
   console.log(`📘 Swagger docs: http://localhost:${process.env.PORT ?? 4000}/api/docs`);
