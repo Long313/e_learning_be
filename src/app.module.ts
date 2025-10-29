@@ -1,7 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { User } from './user/user.entity';
+import { User } from './user/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { StudentModule } from './student/student.module';
+import { UserModule } from './user/user.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { Student } from './student/entities/student.entity';
+import { RefreshToken } from './auth/entitites/refresh-token.entity';
 
 @Module({
   imports: [
@@ -20,8 +27,15 @@ import { User } from './user/user.entity';
       retryAttempts: 10,
       retryDelay: 3000,
       logging: true,
+      entities: [User, Student, RefreshToken],
     }),
-    TypeOrmModule.forFeature([User]),
+    AuthModule,
+    StudentModule,
+    UserModule
   ],
+  providers: [{
+    provide: APP_INTERCEPTOR,
+    useClass: TransformInterceptor
+  }]
 })
 export class AppModule { }

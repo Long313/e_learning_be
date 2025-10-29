@@ -1,5 +1,12 @@
 import { Controller } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiTags} from '@nestjs/swagger';
 
+
+
+@ApiTags('User Management')
 @Controller('user')
-export class UserController {}
+export class UserController {
+    constructor() {
+    }
+
+}
