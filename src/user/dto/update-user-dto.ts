@@ -1,31 +1,6 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-export class UpdateUserDto {
-        @ApiProperty()
-        @IsString()
-        password: string;
 
-        @ApiProperty()
-        @IsString()
-        fullName: string;
-
-        @ApiProperty()
-        @IsNumber()
-        yearOfBirth: number;
-
-        @ApiProperty()
-        @IsString()
-        phoneNumber: string;
-
-        @ApiProperty()  
-        @IsString()
-        address?: string;
-
-        @ApiProperty()
-        @IsString()
-        avatarUrl?: string;
-
-        @ApiProperty()
-        @IsBoolean()
-        isActive?: boolean;
+import { OmitType, PartialType } from '@nestjs/swagger';
+import { CreateUserDto } from './create-user.dto';
+export class UpdateUserDto extends PartialType( OmitType(CreateUserDto, ['email'] as const)) {
+     
 }
