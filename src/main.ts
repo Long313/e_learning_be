@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,7 +16,17 @@ async function bootstrap() {
     .setTitle('My NestJS API')
     .setDescription('Tài liệu API được tạo tự động bằng Swagger')
     .setVersion('1.0')
-    .addBearerAuth() // Nếu dùng JWT
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Nhập JWT token vào ô dưới đây',
+        in: 'header',
+      },
+      'JWT-auth'
+    ) // Nếu dùng JWT
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

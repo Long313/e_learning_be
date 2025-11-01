@@ -1,15 +1,17 @@
 import { Injectable , NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { randomBytes, scrypt as _scrypt, hash } from 'crypto';
 import { promisify } from 'util';
-import { UserType } from 'src/constants/user.constant';
+import type { UserType } from 'src/constants/user.constant';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { removeUndefinedFields } from 'src/common/helpers';
+import { StudentResponseDto } from 'src/student/dto/student-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 const scrypt = promisify(_scrypt);
 
@@ -20,13 +22,14 @@ export class UserService {
         private userRepository: Repository<User>,
     ) {}
 
-    async createUser(body: CreateUserDto) {
+    async createUser(body: CreateUserDto, manager?: EntityManager) {
+        const repo = manager ? manager.getRepository(User) : this.userRepository;
         const hashedPassword = await this.hashPassword(body.password);
-        const newUser = this.userRepository.create({
+        const newUser = repo.create({
             ...body,
             password: hashedPassword,
         });
-        return this.userRepository.save(newUser);
+        return repo.save(newUser);
     }
 
     async getAllUsersByType(type: string, paginationDto: PaginationDto) {
@@ -37,7 +40,7 @@ export class UserService {
         return paginate<User>(queryBuilder, { page, limit });
     }
 
-    async updateUserInfo(id: number, body: UpdateUserDto) {
+    async updateUserInfo(id: string, body: UpdateUserDto) {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
@@ -56,33 +59,57 @@ export class UserService {
         return this.userRepository.findOneBy({ email });
     }
 
-    async createUserFromExtendedDto(dto: any, userType: UserType) {
-            const userDto: CreateUserDto = {
+    async createUserFromExtendedDto(dto: any, userType: UserType, manager?: EntityManager) {
+        const userDto: CreateUserDto = {
             email: dto.email,
             password: dto.password,
             fullName: dto.fullName,
             gender: dto.gender,
-            userType: userType,
-            yearOfBirth: dto.yearOfBirth,
+            dayOfBirth: dto.dayOfBirth,
             phoneNumber: dto.phoneNumber,
             address: dto.address,
             avatarUrl: dto.avatarUrl,
         };
-        
-        return this.createUser(userDto);
+        userDto['userType'] = userType;
+        return this.createUser(userDto, manager);
     }
 
-    async updateUserFromExtendedDto(id: number, dto: any) {
+    async updateUserFromExtendedDto(id: string, dto: any) {
         const updateDto: UpdateUserDto = removeUndefinedFields<UpdateUserDto>({
             password: dto.password,
             fullName: dto.fullName,
             gender: dto.gender,
-            yearOfBirth: dto.yearOfBirth,
+            dayOfBirth: dto.dayOfBirth,
             phoneNumber: dto.phoneNumber,
             address: dto.address,
             avatarUrl: dto.avatarUrl,
         });
 
         return this.updateUserInfo(id, updateDto);
+    }
+
+    async updateRefreshToken(userId: string, refreshToken: string) {
+        await this.userRepository.update(userId, { refreshToken });
+    }
+
+    async checkRefreshToken(refreshToken: string) {
+        return this.userRepository.findOneBy({ refreshToken });
+    }
+
+    async getProfile(userId: string) {
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student'] });
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        if (user.userType === 'student') {
+            const { student, ...userWithoutStudent } = user;
+            return plainToInstance(
+                StudentResponseDto, 
+                Object.assign({}, student, { user: userWithoutStudent }),
+                { excludeExtraneousValues: true }
+            );
+        }
+
     }
 }
