@@ -3,9 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { UserService } from 'src/user/user.service';
-import { RefreshToken } from './entitites/refresh-token.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 const scrypt = promisify(_scrypt);
 
@@ -15,7 +12,7 @@ export class AuthService {
     constructor(
         private jwtService: JwtService, 
         private userService: UserService, 
-        @InjectRepository(RefreshToken) private refreshTokenRepository: Repository<RefreshToken>) {}
+        ) {}
 
 
     async comparePassword(storedPassword: string, suppliedPassword: string) {
@@ -33,39 +30,38 @@ export class AuthService {
         if (!passwordMatch) {
             throw new UnauthorizedException('Invalid email or password');
         }
-        const payload = { sub: user.id, email: user.email, userType: user.userType };
-        const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+        const roles = user.getRoles();
+        const payload = { sub: user.id, email: user.email, roles: roles };
+        const refreshToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
-        await this.refreshTokenRepository.save({ userId: user.id, token: refreshToken });
+        await this.userService.updateRefreshToken(user.id, refreshToken);
         return {
-            accessToken: this.jwtService.sign(payload),
+            accessToken: await this.jwtService.signAsync(payload),
             refreshToken,
         };
     }
 
-    async refreshToken(refreshToken: string) {
+    async refreshAccessToken(refreshToken: string) {
         try {
-            const token = await this.refreshTokenRepository.findOne({ where: { token: refreshToken } });
-            if (!token || token.isRevoked) 
-            {
+            const token = await this.userService.checkRefreshToken(refreshToken);
+            if (!token) {
                 throw new UnauthorizedException('Invalid refresh token');
             }
             const decoded = this.jwtService.verify(refreshToken);
             const accessPayload = { sub: decoded.sub, email: decoded.email, userType: decoded.userType };
+            
+            
             return {
-                accessToken: this.jwtService.sign(accessPayload)
+                accessToken: await this.jwtService.signAsync(accessPayload)
             };
         } catch (e) {
             throw new UnauthorizedException('Invalid refresh token');
         }
+
     }
 
-    async logout(userId: number) {
-        const token = await this.refreshTokenRepository.findOne({ where: { user: { id: userId } } });
-        if (token) {
-            token.isRevoked = true;
-            await this.refreshTokenRepository.save(token);
-        }
-        return { message: 'Logged out successfully' };
+    async revokeRefreshToken(userId: string) {
+        await this.userService.updateRefreshToken(userId, '');
+        return { message: 'Refresh token revoked successfully' };
     }
 }

@@ -1,6 +1,8 @@
-import {IsBoolean, IsString, IsNumber, IsEmail} from 'class-validator';
+import {IsString, IsDate, IsEmail, IsNotEmpty, IsEnum} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { USER_TYPES, GENDERS } from '../../constants/user.constant';
+import { GENDERS} from '../../constants/user.constant';
+import type {UserType, GenderType} from '../../constants/user.constant';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
     @ApiProperty(        {
@@ -8,6 +10,7 @@ export class CreateUserDto {
             example: 'user@example.com',
         })
     @IsEmail()
+    @IsNotEmpty()
     email: string;
 
     @ApiProperty({
@@ -15,6 +18,7 @@ export class CreateUserDto {
         example: 'password123',
     })
     @IsString()
+    @IsNotEmpty()
     password: string;
 
     @ApiProperty({
@@ -22,14 +26,23 @@ export class CreateUserDto {
         example: 'John Doe',
     })
     @IsString()
+    @IsNotEmpty()
     fullName: string;
 
+    @ApiProperty({enum: GENDERS})
+    @IsEnum(GENDERS)
+    @IsNotEmpty()
+    gender: GenderType;
+
     @ApiProperty({
-        description: 'User year of birth',
-        example: 1990,
+        description: 'User birth date',
+        example: '1990-01-01',
+        type: String,
     })
-    @IsNumber()
-    yearOfBirth: number;
+    @Type(() => Date)
+    @IsDate()
+    @IsNotEmpty()
+    dayOfBirth: Date;
 
     @ApiProperty({
         description: 'User phone number',
@@ -51,19 +64,4 @@ export class CreateUserDto {
     })
     @IsString()
     avatarUrl?: string;
-
-    @ApiProperty({ enum: USER_TYPES })
-    @IsString()
-    userType: typeof USER_TYPES[number];
-
-    @ApiProperty({
-        description: 'Is the user active?',
-        example: true,
-    })
-    @IsBoolean()
-    isActive?: boolean;
-
-    @ApiProperty({enum: GENDERS})
-    @IsString()
-    gender: typeof GENDERS[number];
 }

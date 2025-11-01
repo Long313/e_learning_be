@@ -1,16 +1,19 @@
 import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterRemove, AfterUpdate, OneToOne, JoinColumn, OneToMany } from 'typeorm';
-import { USER_TYPES, GENDERS } from '../../constants/user.constant';
+import { USER_TYPES, GENDERS, STATUS, AssociatedEntity, ROLES_MAP} from '../../constants/user.constant';
 import { Student } from 'src/student/entities/student.entity';
-import { RefreshToken } from 'src/auth/entitites/refresh-token.entity';
-
+import { Exclude } from 'class-transformer';
+import { Staff } from 'src/staff/entities/staff.entity';
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+
+    // Columns
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({ unique: true })
     email: string;
 
+    @Exclude()
     @Column({nullable: true})
     password: string;
 
@@ -24,7 +27,7 @@ export class User {
     gender: string;
 
     @Column()
-    yearOfBirth: number;
+    dayOfBirth: Date;
 
     @Column({ nullable: true })
     phoneNumber: string;
@@ -37,28 +40,54 @@ export class User {
 
     @Column({
         type: 'enum',
+        enum: STATUS,
+        default: 'active',
+    })
+    status: string;
+
+    @Column({
+        type: 'enum',
         enum: USER_TYPES
     })
     userType: string;    
 
-    @Column({ nullable: true })
-    userTypeId: number;
+    @Column({ type: 'uuid', nullable: true })
+    userTypeId: string;
 
-    @Column({ default: true })
-    isActive: boolean;
+    @Exclude()
+    @Column({ unique: true, nullable: true })
+    refreshToken: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
+    @Exclude()
+    @Column({ type: 'uuid', nullable: true })
+    createdBy: string | null;
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
+    @Exclude()
+    @Column({ type: 'uuid', nullable: true })
+    updatedBy: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+    deletedAt: Date | null;
+
+    @Exclude()
+    @Column({ type: 'uuid', nullable: true })
+    deletedBy: string | null;
+
+    // Relations
+
     @OneToOne(() => Student, student => student.user)
-    @JoinColumn({ name: 'userTypeId', referencedColumnName: 'id' })
     student: Student;
 
-    @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
-    refreshTokens: RefreshToken[];
+    @OneToOne(() => Staff, staff => staff.user)
+    staff: Staff;
+
+    // Lifecycle Hooks
 
     @AfterInsert()
     logInsert() {
@@ -76,8 +105,33 @@ export class User {
     }
 
 
+    // Custom Methods
+
     getAge(): number {
         const currentYear = new Date().getFullYear();
-        return currentYear - this.yearOfBirth;
+        return currentYear - this.dayOfBirth.getFullYear();
+    }
+
+    getRoles(): string[] {
+        if (['student', 'admin'].includes(this.userType)) {
+            return [ROLES_MAP[this.userType]];
+        }
+        if (this.userType === 'staff') {
+            const roles: string[] = [];
+            if (this.staff && this.staff.teacher) {
+                roles.push(ROLES_MAP['teacher']);
+            }
+            return roles;
+        }
+        return []
+    }
+
+    getAssociatedEntity(): AssociatedEntity {
+        if (this.userType === 'student') {
+            return this.student; 
+        } else if (this.userType === 'staff') {
+            return this.staff;
+        }
+        return null;
     }
 }

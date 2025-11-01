@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { UserService } from 'src/user/user.service';
@@ -8,6 +8,8 @@ import { Repository, DataSource } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { removeUndefinedFields } from 'src/common/helpers';
+import { StudentResponseDto } from './dto/student-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class StudentService {
@@ -19,7 +21,7 @@ export class StudentService {
 
   async create(createStudentDto: CreateStudentDto) {
     return await this.dataSource.transaction(async (manager) => {
-      const user = await this.userService.createUserFromExtendedDto(createStudentDto, 'student');
+      const user = await this.userService.createUserFromExtendedDto(createStudentDto, 'student', manager);
 
       const student = manager.create(Student, {
         user: user,
@@ -29,11 +31,16 @@ export class StudentService {
 
       const savedStudent = await manager.save(Student, student);
 
-      await manager.update('users', user.id, {
+      await manager.getRepository('users').update(user.id, {
         userTypeId: savedStudent.id,
       });
 
-      return { user, student: savedStudent };
+      const studentWithUser = await manager.findOne(Student, {
+        where: { id: savedStudent.id },
+        relations: ['user'],
+      });
+
+      return plainToInstance(StudentResponseDto, studentWithUser, { excludeExtraneousValues: true});
     });
   }
 
@@ -42,23 +49,35 @@ export class StudentService {
     const queryBuilder = this.studentRepository.createQueryBuilder('student')
       .leftJoinAndSelect('student.user', 'user');
 
-    return paginate<Student>(queryBuilder, { page, limit });
+    const result = await paginate<Student>(queryBuilder, { page, limit });
+
+    return {
+      ...result,
+      items: plainToInstance(StudentResponseDto, result.items, { excludeExtraneousValues: true}),
+    }
   }
 
-  findOne(id: number) {
-    return this.studentRepository.findOne({
+  findOne(id: string) {
+    const result = this.studentRepository.findOne({
       where: { id },
       relations: ['user'],
     });
+    return plainToInstance(StudentResponseDto, result, { excludeExtraneousValues: true });
   }
 
-  async update(id: number, updateStudentDto: UpdateStudentDto) {
-    await this.userService.updateUserInfo(id, updateStudentDto);
+  async update(userId: string, updateStudentDto: UpdateStudentDto) {
+    const student = await this.studentRepository.findOneBy({ user: { id: userId } });
+    if (!student) {
+      throw new NotFoundException(`Student with user ID ${userId} not found`);
+    }
+    const studentId = student.id;
+    await this.userService.updateUserInfo(userId, updateStudentDto);
     const updateDto = removeUndefinedFields<UpdateStudentDto>({
       schoolGrade: updateStudentDto.schoolGrade,
       startDate: updateStudentDto.startDate,
     });
-    await this.studentRepository.update(id, updateDto);
-    return this.findOne(id);
+
+    await this.studentRepository.update(studentId, updateDto);
+    return this.findOne(studentId);
   }
 }

@@ -1,6 +1,6 @@
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsDate } from 'class-validator';
 
 export class CreateStudentDto extends CreateUserDto {
     @ApiProperty()
@@ -9,5 +9,6 @@ export class CreateStudentDto extends CreateUserDto {
     schoolGrade: number;
 
     @ApiProperty()
+    @IsDate()
     startDate: Date;
 }

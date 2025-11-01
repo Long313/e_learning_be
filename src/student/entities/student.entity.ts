@@ -1,11 +1,11 @@
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn } from 'typeorm';
 
 @Entity('students')
 
 export class Student {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column()
     schoolGrade: number;
@@ -13,7 +13,8 @@ export class Student {
     @Column()
     startDate: Date;
 
-    @OneToOne(() => User, user => user.student)
+    @OneToOne(() => User, user => user.student, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' })
     user: User;
 
     @AfterInsert()

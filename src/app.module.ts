@@ -8,7 +8,13 @@ import { UserModule } from './user/user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { Student } from './student/entities/student.entity';
-import { RefreshToken } from './auth/entitites/refresh-token.entity';
+import { StaffModule } from './staff/staff.module';
+import { TeacherModule } from './teacher/teacher.module';
+import { BranchModule } from './branch/branch.module';
+import { Branch } from './branch/entities/branch.entity';
+import { Teacher } from './teacher/entities/teacher.entity';
+import { Staff } from './staff/entities/staff.entity';
+
 
 @Module({
   imports: [
@@ -27,11 +33,14 @@ import { RefreshToken } from './auth/entitites/refresh-token.entity';
       retryAttempts: 10,
       retryDelay: 3000,
       logging: true,
-      entities: [User, Student, RefreshToken],
+      // dropSchema: true,
     }),
     AuthModule,
     StudentModule,
-    UserModule
+    UserModule,
+    StaffModule,
+    TeacherModule,
+    BranchModule,
   ],
   providers: [{
     provide: APP_INTERCEPTOR,
