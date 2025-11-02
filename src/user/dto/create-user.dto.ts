@@ -7,7 +7,7 @@ import { Type } from 'class-transformer';
 export class CreateUserDto {
     @ApiProperty(        {
             description: 'User email address',
-            example: 'user@example.com',
+            example: 'vanphuoc1028@gmail.com',
         })
     @IsEmail()
     @IsNotEmpty()

@@ -1,8 +1,9 @@
+import { BranchManager } from 'src/branch-manager/entities/branch-manager.entity';
 import { Entity } from 'typeorm';
-import { Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, OneToMany } from 'typeorm';
 
 
-@Entity()
+@Entity('branches')
 
 export class Branch {
     @PrimaryGeneratedColumn('uuid')
@@ -16,6 +17,9 @@ export class Branch {
 
     @Column({ nullable: true })
     phone: string;
+
+    @OneToMany(() => BranchManager, (manager) => manager.branch)
+    managers: BranchManager[];
 
     @AfterInsert()
     logInsert() {

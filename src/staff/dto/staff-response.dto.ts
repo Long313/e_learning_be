@@ -19,7 +19,7 @@ export class TeacherInfoDto {
 }
 
 @Exclude()
-export class ResponseStaffDto extends BaseUserResponseDto {
+export class StaffResponseDto extends BaseUserResponseDto {
     @ApiProperty({
         description: 'Teacher information if staff is a teacher',
         type: TeacherInfoDto,

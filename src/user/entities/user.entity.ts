@@ -41,7 +41,7 @@ export class User {
     @Column({
         type: 'enum',
         enum: STATUS,
-        default: 'active',
+        default: 'pending',
     })
     status: string;
 

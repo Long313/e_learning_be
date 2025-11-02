@@ -19,6 +19,9 @@ export class Staff {
     @OneToOne(() => Teacher, teacher => teacher.staff)
     teacher: Teacher;
 
+    @OneToOne(() => Staff, staff => staff.branchManager)
+    branchManager: Staff;
+
     @AfterInsert()
     logInsert() {
         console.log(`Staff inserted with id: ${this.id}`);

@@ -1,10 +1,11 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RefreshTokenDto, RevokeRefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from 'src/common/decorators/public-api.decorator';
+import { ResetPasswordConfirmDto, ResetPasswordRequestDto } from './dto/reset-password.dto';
 
 
 @ApiTags('Authentication')
@@ -42,7 +43,54 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User logged out successfully.' })
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'User logout' })
-  async logout(@Body('userId') userId: string) {
+  async logout(@Body() revokeRefreshTokenDto: RevokeRefreshTokenDto) {
+    const { userId } = revokeRefreshTokenDto;
     return this.authService.revokeRefreshToken(userId);
+  }
+
+  @Get('activate')
+  @ApiResponse({ status: 200, description: 'Token is valid, user is verified.' })
+  @ApiOperation({ summary: 'Check active token from activation link' })
+  @Public()
+  async active(@Query('token') token?: string) {
+    return this.authService.validateActiveToken(token);
+  }
+
+  @Post('resend-activation')
+  @ApiResponse({ status: 200, description: 'Activation email resent successfully.' })
+  @ApiOperation({ summary: 'Resend activation email' })
+  @Public()
+  async resendActivationEmail(@Body() resetPasswordRequestDto: ResetPasswordRequestDto) {
+    const { email } = resetPasswordRequestDto;
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+    return this.authService.resendActivationEmail(email);
+  }
+
+  @Post('reset-password-request')
+  @ApiResponse({ status: 200, description: 'Password reset link sent successfully.' })
+  @ApiOperation({ summary: 'Request password reset link' })
+  @Public()
+  async requestPasswordReset(@Body() resetPasswordRequestDto: ResetPasswordRequestDto) {
+    const { email } = resetPasswordRequestDto;
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+    return this.authService.requestPasswordReset(email);
+  }
+
+  @Post('reset-password-confirm')
+  @ApiResponse({ status: 200, description: 'Password has been reset successfully.' })
+  @ApiOperation({ summary: 'Confirm password reset with token' })
+  @Public()
+  async confirmPasswordReset(
+    @Body() resetPasswordConfirmDto: ResetPasswordConfirmDto,
+  ) {
+    const { token, newPassword } = resetPasswordConfirmDto;
+    if (!token || !newPassword) {
+      throw new BadRequestException('Token and new password are required');
+    }
+    return this.authService.resetPassword(token, newPassword);
   }
 }
