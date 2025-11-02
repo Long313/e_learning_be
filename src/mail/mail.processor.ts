@@ -30,4 +30,22 @@ export class MailProcessor {
       `,
     });
   }
+
+  @Process('sendPasswordReset')
+  async handleSendPasswordReset(job: Job<{ to: string; name: string; resetLink: string }>) {
+    const { to, name, resetLink } = job.data;
+
+    await this.transporter.sendMail({
+      from: process.env.MAIL_FROM || process.env.MAIL_USER,
+      to,
+      subject: 'Đặt lại mật khẩu của bạn',
+      html: `
+        <p>Xin chào ${name},</p>
+        <p>Nhấn vào liên kết sau để đặt lại mật khẩu:</p>
+        <p><a href="${resetLink}">${resetLink}</a></p>
+        <p>Liên kết sẽ hết hạn sau ${process.env.JWT_RESET_PASSWORD_EXPIRES || '24h'}.</p>
+        <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+      `,
+    });
+  }
 }

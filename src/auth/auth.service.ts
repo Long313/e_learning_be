@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { UserService } from 'src/user/user.service';
-import { randomBytes } from 'crypto';
+import { RedisService } from 'src/redis/redis.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -12,7 +12,8 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(
         private jwtService: JwtService, 
-        private userService: UserService, 
+        private userService: UserService,
+        private redis: RedisService
         ) {}
 
 
@@ -126,8 +127,13 @@ export class AuthService {
             throw new BadRequestException('Invalid or expired token');
         }
 
-        if (payload.typ !== 'password_reset' || !payload.sub) {
+        if (payload.typ !== 'password_reset' || !payload.sub || !payload.jti) {
             throw new BadRequestException('Invalid token payload');
+        }
+
+        const consumed = await this.redis.getAndDel(`prt:${payload.jti}`);
+        if (!consumed) {
+            throw new BadRequestException('Password reset token has already been used or is invalid');
         }
 
         const user = await this.userService.findById(payload.sub);

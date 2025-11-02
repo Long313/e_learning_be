@@ -3,11 +3,12 @@ import { BranchService } from './branch.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { PrivateController } from 'src/common/controllers/private.controller';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('branch')
+@ApiBearerAuth()
 @Controller('branch')
 @Roles('admin')
 export class BranchController extends PrivateController {
