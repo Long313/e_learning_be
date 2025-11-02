@@ -12,6 +12,8 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { removeUndefinedFields } from 'src/common/helpers';
 import { StudentResponseDto } from 'src/student/dto/student-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { MailService } from 'src/mail/mail.service';
+import { StaffResponseDto } from 'src/staff/dto/staff-response.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -20,6 +22,7 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        private mailService: MailService,
     ) {}
 
     async createUser(body: CreateUserDto, manager?: EntityManager) {
@@ -33,7 +36,8 @@ export class UserService {
     }
 
     async getAllUsersByType(type: string, paginationDto: PaginationDto) {
-        const { page = 1, limit = 10 } = paginationDto;
+        const page = paginationDto.page ?? 1;
+        const limit = paginationDto.limit ?? 10;
         const queryBuilder = this.userRepository.createQueryBuilder('user')
             .where('user.userType = :type', { type });
 
@@ -97,19 +101,51 @@ export class UserService {
     }
 
     async getProfile(userId: string) {
-        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student'] });
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher'] });
         if (!user) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
         if (user.userType === 'student') {
-            const { student, ...userWithoutStudent } = user;
+            const student = user.student
+           const userWithoutStudent = Object.assign(new User(), user);
             return plainToInstance(
                 StudentResponseDto, 
-                Object.assign({}, student, { user: userWithoutStudent }),
+                {...student, user: userWithoutStudent},
                 { excludeExtraneousValues: true }
             );
         }
 
+        if (user.userType === 'staff') {
+            const staff = user.staff;
+            const userWithoutStaff = Object.assign(new User(), user); 
+            return plainToInstance(StaffResponseDto, 
+                {...staff, user: userWithoutStaff},
+                { excludeExtraneousValues: true }
+            );
+        }
+
+    }
+
+    async findById(id: string) {
+        return this.userRepository.findOneBy({ id });
+    }
+    
+    async sendActivationEmail(user: User) {
+        const mailOptions = {
+           id: user.id,
+           email: user.email,
+              fullName: user.fullName,
+        };
+        await this.mailService.enqueueActivationEmail(mailOptions);
+    }
+
+    async sendPasswordResetEmail(user: User) {
+        const mailOptions = {
+           id: user.id,
+           email: user.email,
+              fullName: user.fullName,
+        };
+        await this.mailService.enqueuePasswordResetEmail(mailOptions);
     }
 }

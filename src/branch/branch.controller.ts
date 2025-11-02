@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { BranchService } from './branch.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { PrivateController } from 'src/common/controllers/private.controller';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('branch')
 @Controller('branch')
 @Roles('admin')
-export class BranchController implements PrivateController {
-  constructor(private readonly branchService: BranchService) {}
+export class BranchController extends PrivateController {
+  constructor(private readonly branchService: BranchService) {
+    super();
+  }
 
   @Post()
   create(@Body() createBranchDto: CreateBranchDto) {
@@ -18,8 +21,8 @@ export class BranchController implements PrivateController {
   }
 
   @Get()
-  findAll(@Param('page') page: number = 1, @Param('perPage') perPage: number = 10) {
-    return this.branchService.findAll(page, perPage);
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.branchService.findAll(paginationDto);
   }
 
   @Get(':id')

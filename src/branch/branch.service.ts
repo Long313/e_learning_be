@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Branch } from './entities/branch.entity';
 import { Repository } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class BranchService {
@@ -18,9 +19,11 @@ export class BranchService {
     return this.branchRepository.save(branch);
   }
 
-  findAll(page: number = 1, perPage: number = 10) {
+  findAll(paginationDto: PaginationDto) {
+    const page = paginationDto.page ?? 1;
+    const limit = paginationDto.limit ?? 10;
     const queryBuilder = this.branchRepository.createQueryBuilder('branch');
-    return paginate<Branch>(queryBuilder, { page, limit: perPage });
+    return paginate<Branch>(queryBuilder, { page, limit });
   }
 
   findOne(id: string) {

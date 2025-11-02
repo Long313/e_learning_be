@@ -1,26 +1,33 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { UserService } from 'src/user/user.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { removeUndefinedFields } from 'src/common/helpers';
 import { StudentResponseDto } from './dto/student-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { ParentService } from 'src/parent/parent.service';
+
 
 @Injectable()
 export class StudentService {
   constructor(
     private userService: UserService, 
+    private parentService: ParentService,
     @InjectRepository(Student) private studentRepository: Repository<Student>,
     private dataSource: DataSource
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
-    return await this.dataSource.transaction(async (manager) => {
+    const existingUser = await this.userService.findByEmail(createStudentDto.email);
+    if (existingUser) {
+      throw new BadRequestException(`User with email ${createStudentDto.email} already exists`);
+    }
+    const result = await this.dataSource.transaction(async (manager) => {
       const user = await this.userService.createUserFromExtendedDto(createStudentDto, 'student', manager);
 
       const student = manager.create(Student, {
@@ -31,6 +38,8 @@ export class StudentService {
 
       const savedStudent = await manager.save(Student, student);
 
+      await this.createParent(createStudentDto, manager, savedStudent);
+
       await manager.getRepository('users').update(user.id, {
         userTypeId: savedStudent.id,
       });
@@ -40,12 +49,16 @@ export class StudentService {
         relations: ['user'],
       });
 
-      return plainToInstance(StudentResponseDto, studentWithUser, { excludeExtraneousValues: true});
-    });
+      return { studentWithUser, user }
+      });
+
+      await this.userService.sendActivationEmail(result.user);
+      return plainToInstance(StudentResponseDto, result.studentWithUser, { excludeExtraneousValues: true });
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { page = 1, limit = 10 } = paginationDto;
+    const page = paginationDto.page ?? 1;
+    const limit = paginationDto.limit ?? 10;
     const queryBuilder = this.studentRepository.createQueryBuilder('student')
       .leftJoinAndSelect('student.user', 'user');
 
@@ -79,5 +92,17 @@ export class StudentService {
 
     await this.studentRepository.update(studentId, updateDto);
     return this.findOne(studentId);
+  }
+
+  private async createParent(createStudentDto: CreateStudentDto, manager: EntityManager, student: Student) {
+    const parentDto = {
+      fullName: createStudentDto.parentFullName,
+      email: createStudentDto.parentEmail,
+      phoneNumber: createStudentDto.parentPhoneNumber,
+      address: createStudentDto.parentAddress,
+      student: student,
+    };
+    const parent = await this.parentService.create(parentDto, manager);
+    return parent;
   }
 }

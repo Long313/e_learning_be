@@ -16,7 +16,7 @@ export class UserController {
     @ApiOperation({ summary: 'Get current user profile' })
     @ApiResponse({ status: 200, description: 'Profile retrieved successfully.' })
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    async getProfile(@CurrentUser() user: User) {
-        return this.userService.getProfile(user.id);
+    async getProfile(@CurrentUser() user) {
+        return this.userService.getProfile(user.userId);
     }
 }

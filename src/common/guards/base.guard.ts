@@ -15,6 +15,11 @@ export abstract class BaseGuard implements CanActivate {
     if (isPublic) {
       return true; 
     }
+
+    const { user } = context.switchToHttp().getRequest();
+    if (!user || user.status !== 'active') {
+      return false;
+    }
     return this.handleGuard(context);
   }
 

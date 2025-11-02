@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { UserService } from 'src/user/user.service';
+import { randomBytes } from 'crypto';
 
 const scrypt = promisify(_scrypt);
 
@@ -63,5 +64,81 @@ export class AuthService {
     async revokeRefreshToken(userId: string) {
         await this.userService.updateRefreshToken(userId, '');
         return { message: 'Refresh token revoked successfully' };
+    }
+
+    async validateActiveToken(token?: string) {
+        if (!token) throw new BadRequestException('Missing token');
+
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token, { secret: process.env.JWT_ACTIVATION_SECRET });
+    } catch {
+      throw new BadRequestException('Invalid or expired token');
+    }
+
+    if (payload.typ !== 'activation' || !payload.sub) {
+      throw new BadRequestException('Invalid token payload');
+    }
+
+    const user = await this.userService.findById(payload.sub);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.status === 'active') {
+      throw new BadRequestException('User is already verified');
+    }
+
+    await this.userService.updateUserInfo(user.id, { status: 'active' });
+    return { message: 'Account activated successfully' };
+    }
+
+    async resendActivationEmail(email: string) {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.status === 'active') {
+            throw new BadRequestException('User is already verified');
+        }
+
+        await this.userService.sendActivationEmail(user);
+
+        return { message: 'Activation email resent successfully' };
+    }
+
+    async requestPasswordReset(email: string) {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        await this.userService.sendPasswordResetEmail(user);
+
+        return { message: 'Password reset link sent successfully' };
+    }
+
+    async resetPassword(token: string, newPassword: string) {
+        let payload: any;
+        try {
+            payload = this.jwtService.verify(token, { secret: process.env.JWT_PASSWORD_RESET_SECRET });
+        } catch {
+            throw new BadRequestException('Invalid or expired token');
+        }
+
+        if (payload.typ !== 'password_reset' || !payload.sub) {
+            throw new BadRequestException('Invalid token payload');
+        }
+
+        const user = await this.userService.findById(payload.sub);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const hashedPassword = await this.userService.hashPassword(newPassword);
+
+        await this.userService.updateUserInfo(user.id, { password: hashedPassword });
+
+        return { message: 'Password reset successfully' };
     }
 }

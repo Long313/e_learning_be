@@ -4,10 +4,12 @@ import { StudentController } from './student.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Student } from './entities/student.entity';
 import { UserModule } from 'src/user/user.module';
+import { ParentModule } from 'src/parent/parent.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   controllers: [StudentController],
   providers: [StudentService],
-  imports: [TypeOrmModule.forFeature([Student]), UserModule]
+  imports: [TypeOrmModule.forFeature([Student]), UserModule, ParentModule]
 })
 export class StudentModule {}

@@ -1,5 +1,6 @@
+import { Parent } from 'src/parent/entities/parent.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('students')
 
@@ -16,6 +17,9 @@ export class Student {
     @OneToOne(() => User, user => user.student, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    @OneToMany(() => Parent, parent => parent.student)
+    parents: Parent[];
 
     @AfterInsert()
     logInsert() {

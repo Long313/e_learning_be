@@ -43,6 +43,10 @@ export class StaffService {
                 relations: ['user', 'teacher'],
             });
 
+            if (staffWithRelations?.user) {
+                staffWithRelations.user.staff = staffWithRelations;
+            }
+
             return staffWithRelations;
         });
     }
