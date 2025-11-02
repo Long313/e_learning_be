@@ -1,13 +1,19 @@
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateIf } from "class-validator";
-import { STAFF_TYPES, ACADEMIC_TITLES, DEGREES } from "src/constants/user.constant";
-import type { StaffType, DegreeType, AcademicTitleType } from "src/constants/user.constant";
+import { STAFF_TYPES, ACADEMIC_TITLES, DEGREES, STATUS } from "src/constants/user.constant";
+import type { StaffType, DegreeType, AcademicTitleType, StatusType } from "src/constants/user.constant";
 
 export class CreateStaffDto extends CreateUserDto {
-    @ApiProperty(
-        {enum: STAFF_TYPES}
-    )
+
+
+    @ApiProperty({ enum: STATUS, default: 'active' })
+    @IsEnum(STATUS)
+    @IsNotEmpty()
+    status: StatusType;
+
+
+    @ApiProperty({enum: STAFF_TYPES})
     @IsEnum(STAFF_TYPES)
     staffType: StaffType;
 

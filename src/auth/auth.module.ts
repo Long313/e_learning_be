@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisModule } from 'src/redis/redis.module';
 @Module({
   controllers: [AuthController],
   providers: [
@@ -33,7 +34,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         };
       },
     }),
-    UserModule
+    UserModule,
+    RedisModule
   ],
   exports: [JwtModule, PassportModule, JwtAuthGuard],
     
