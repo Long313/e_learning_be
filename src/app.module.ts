@@ -39,6 +39,9 @@ import { MailModule } from './mail/mail.module';
       retryAttempts: 10,
       retryDelay: 3000,
       logging: true,
+      ssl: process.env.DB_SSL === 'true'
+        ? { rejectUnauthorized: false }
+        : false,
       // dropSchema: true,
     }),
     AuthModule,
