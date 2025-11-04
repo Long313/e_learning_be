@@ -3,6 +3,7 @@ import { USER_TYPES, GENDERS, STATUS, AssociatedEntity, ROLES_MAP} from '../../c
 import { Student } from 'src/student/entities/student.entity';
 import { Exclude } from 'class-transformer';
 import { Staff } from 'src/staff/entities/staff.entity';
+import { Admin } from 'src/admin/entities/admin.entity';
 @Entity('users')
 export class User {
 
@@ -87,6 +88,9 @@ export class User {
     @OneToOne(() => Staff, staff => staff.user)
     staff: Staff;
 
+    @OneToOne(() => Admin, admin => admin.user)
+    admin: Admin;
+
     // Lifecycle Hooks
 
     @AfterInsert()
@@ -118,8 +122,13 @@ export class User {
         }
         if (this.userType === 'staff') {
             const roles: string[] = [];
-            if (this.staff && this.staff.teacher) {
-                roles.push(ROLES_MAP['teacher']);
+            if (this.staff) {
+                if (this.staff.teacher) {
+                    roles.push(ROLES_MAP['teacher']);
+                }
+                if (this.staff.branchManager) {
+                    roles.push(ROLES_MAP['branch_manager']);
+                }
             }
             return roles;
         }

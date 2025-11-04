@@ -2,6 +2,7 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn , JoinColumn, AfterIns
 import { User } from "src/user/entities/user.entity";
 import { Teacher } from "src/teacher/entities/teacher.entity";
 import { Exclude } from "class-transformer";
+import { BranchManager } from "src/branch-manager/entities/branch-manager.entity";
 
 @Entity('staffs')
 export class Staff {
@@ -19,8 +20,8 @@ export class Staff {
     @OneToOne(() => Teacher, teacher => teacher.staff)
     teacher: Teacher;
 
-    @OneToOne(() => Staff, staff => staff.branchManager)
-    branchManager: Staff;
+    @OneToOne(() => BranchManager, branchManager => branchManager.staff)
+    branchManager: BranchManager;
 
     @AfterInsert()
     logInsert() {

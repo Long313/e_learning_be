@@ -1,3 +1,4 @@
+import { Branch } from 'src/branch/entities/branch.entity';
 import { Parent } from 'src/parent/entities/parent.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn, OneToMany } from 'typeorm';
@@ -20,6 +21,9 @@ export class Student {
 
     @OneToMany(() => Parent, parent => parent.student)
     parents: Parent[];
+
+    @OneToMany(() => Branch, branch => branch.students)
+    branch: Branch;
 
     @AfterInsert()
     logInsert() {

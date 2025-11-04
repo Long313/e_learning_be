@@ -1,5 +1,6 @@
 import { BranchManager } from 'src/branch-manager/entities/branch-manager.entity';
-import { Entity } from 'typeorm';
+import { Student } from 'src/student/entities/student.entity';
+import { Entity, ManyToMany } from 'typeorm';
 import { Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, OneToMany } from 'typeorm';
 
 
@@ -20,6 +21,9 @@ export class Branch {
 
     @OneToMany(() => BranchManager, (manager) => manager.branch)
     managers: BranchManager[];
+
+    @OneToMany(() => Student, (student) => student.branch)
+    students: Student[];
 
     @AfterInsert()
     logInsert() {

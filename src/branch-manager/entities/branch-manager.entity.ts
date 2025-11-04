@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, AfterInsert, AfterUpdate, AfterRemove, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, AfterInsert, AfterUpdate, AfterRemove, OneToOne, JoinColumn } from 'typeorm';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Staff } from 'src/staff/entities/staff.entity';
 
@@ -11,6 +11,7 @@ export class BranchManager {
   branch: Branch;
 
   @OneToOne(() => Staff, (staff) => staff.branchManager)
+  @JoinColumn({ name: 'staffId' })
   staff: Staff;
 
     @AfterInsert()
