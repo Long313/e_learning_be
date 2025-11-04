@@ -19,6 +19,17 @@ export class TeacherInfoDto {
 }
 
 @Exclude()
+export class BranchManagerInfoDto {
+    @ApiProperty({ description: 'Branch ID', example: 'branch-id' })
+    @Expose()
+    branchId: string;
+
+    @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
+    @Expose()
+    branchName: string;
+}
+
+@Exclude()
 export class StaffResponseDto extends BaseUserResponseDto {
     @ApiProperty({
         description: 'Teacher information if staff is a teacher',
@@ -29,4 +40,22 @@ export class StaffResponseDto extends BaseUserResponseDto {
     @Type(() => TeacherInfoDto)
     @Transform(({ obj }) => obj.teacher || null)
     teacher?: TeacherInfoDto | null;
+
+    @ApiProperty({
+        description: 'Branch Manager information if staff is a branch manager',
+        type: BranchManagerInfoDto,
+        required: false,
+    })
+    @Expose()
+    @Type(() => BranchManagerInfoDto)
+    @Transform(({ obj }) => {
+        if (obj.branchManager && obj.branchManager.branch) {
+            return {
+                branchId: obj.branchManager.branch.id,
+                branchName: obj.branchManager.branch.name,
+            };
+        }
+        return null;
+    })
+    branchManager?: BranchManagerInfoDto | null;
 }

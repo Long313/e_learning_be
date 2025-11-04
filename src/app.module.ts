@@ -13,6 +13,8 @@ import { BranchManagerModule } from './branch-manager/branch-manager.module';
 import { ParentModule } from './parent/parent.module';
 import { BullModule } from '@nestjs/bull';
 import { MailModule } from './mail/mail.module';
+import { CourseModule } from './course/course.module';
+import { AdminModule } from './admin/admin.module';
 
 
 @Module({
@@ -49,6 +51,8 @@ import { MailModule } from './mail/mail.module';
     BranchModule,
     BranchManagerModule,
     ParentModule,
+    CourseModule,
+    AdminModule,
   ],
   providers: [{
     provide: APP_INTERCEPTOR,
