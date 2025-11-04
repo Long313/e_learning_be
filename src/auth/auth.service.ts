@@ -3,19 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { UserService } from 'src/user/user.service';
-import { RedisService } from 'src/redis/redis.service';
 
 const scrypt = promisify(_scrypt);
-
 
 @Injectable()
 export class AuthService {
     constructor(
-        private jwtService: JwtService, 
+        private jwtService: JwtService,
         private userService: UserService,
-        private redis: RedisService
-        ) {}
-
+    ) { }
 
     async comparePassword(storedPassword: string, suppliedPassword: string) {
         const [salt, key] = storedPassword.split('.');
@@ -25,18 +21,17 @@ export class AuthService {
 
     async login(email: string, password: string) {
         const user = await this.userService.findByEmail(email);
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+        if (!user) throw new NotFoundException('User not found');
+
         const passwordMatch = await this.comparePassword(user.password, password);
-        if (!passwordMatch) {
-            throw new UnauthorizedException('Invalid email or password');
-        }
+        if (!passwordMatch) throw new UnauthorizedException('Invalid email or password');
+
         const roles = user.getRoles();
-        const payload = { sub: user.id, email: user.email, roles: roles };
+        const payload = { sub: user.id, email: user.email, roles };
         const refreshToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
         await this.userService.updateRefreshToken(user.id, refreshToken);
+
         return {
             accessToken: await this.jwtService.signAsync(payload),
             refreshToken,
@@ -46,20 +41,17 @@ export class AuthService {
     async refreshAccessToken(refreshToken: string) {
         try {
             const token = await this.userService.checkRefreshToken(refreshToken);
-            if (!token) {
-                throw new UnauthorizedException('Invalid refresh token');
-            }
+            if (!token) throw new UnauthorizedException('Invalid refresh token');
+
             const decoded = this.jwtService.verify(refreshToken);
             const accessPayload = { sub: decoded.sub, email: decoded.email, userType: decoded.userType };
-            
-            
+
             return {
-                accessToken: await this.jwtService.signAsync(accessPayload)
+                accessToken: await this.jwtService.signAsync(accessPayload),
             };
-        } catch (e) {
+        } catch {
             throw new UnauthorizedException('Invalid refresh token');
         }
-
     }
 
     async revokeRefreshToken(userId: string) {
@@ -70,52 +62,40 @@ export class AuthService {
     async validateActiveToken(token?: string) {
         if (!token) throw new BadRequestException('Missing token');
 
-    let payload: any;
-    try {
-      payload = this.jwtService.verify(token, { secret: process.env.JWT_ACTIVATION_SECRET });
-    } catch {
-      throw new BadRequestException('Invalid or expired token');
-    }
+        let payload: any;
+        try {
+            payload = this.jwtService.verify(token, { secret: process.env.JWT_ACTIVATION_SECRET });
+        } catch {
+            throw new BadRequestException('Invalid or expired token');
+        }
 
-    if (payload.typ !== 'activation' || !payload.sub) {
-      throw new BadRequestException('Invalid token payload');
-    }
+        if (payload.typ !== 'activation' || !payload.sub) {
+            throw new BadRequestException('Invalid token payload');
+        }
 
-    const user = await this.userService.findById(payload.sub);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+        const user = await this.userService.findById(payload.sub);
+        if (!user) throw new NotFoundException('User not found');
 
-    if (user.status === 'active') {
-      throw new BadRequestException('User is already verified');
-    }
+        if (user.status === 'active') throw new BadRequestException('User is already verified');
 
-    await this.userService.updateUserInfo(user.id, { status: 'active' });
-    return { message: 'Account activated successfully' };
+        await this.userService.updateUserInfo(user.id, { status: 'active' });
+        return { message: 'Account activated successfully' };
     }
 
     async resendActivationEmail(email: string) {
         const user = await this.userService.findByEmail(email);
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-        if (user.status === 'active') {
-            throw new BadRequestException('User is already verified');
-        }
+        if (!user) throw new NotFoundException('User not found');
+        if (user.status === 'active') throw new BadRequestException('User is already verified');
 
         await this.userService.sendActivationEmail(user);
-
         return { message: 'Activation email resent successfully' };
     }
 
     async requestPasswordReset(email: string) {
         const user = await this.userService.findByEmail(email);
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+        if (!user) throw new NotFoundException('User not found');
 
         await this.userService.sendPasswordResetEmail(user);
-
         return { message: 'Password reset link sent successfully' };
     }
 
@@ -127,22 +107,14 @@ export class AuthService {
             throw new BadRequestException('Invalid or expired token');
         }
 
-        if (payload.typ !== 'password_reset' || !payload.sub || !payload.jti) {
+        if (payload.typ !== 'password_reset' || !payload.sub) {
             throw new BadRequestException('Invalid token payload');
         }
 
-        const consumed = await this.redis.getAndDel(`prt:${payload.jti}`);
-        if (!consumed) {
-            throw new BadRequestException('Password reset token has already been used or is invalid');
-        }
-
         const user = await this.userService.findById(payload.sub);
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+        if (!user) throw new NotFoundException('User not found');
 
         const hashedPassword = await this.userService.hashPassword(newPassword);
-
         await this.userService.updateUserInfo(user.id, { password: hashedPassword });
 
         return { message: 'Password reset successfully' };
