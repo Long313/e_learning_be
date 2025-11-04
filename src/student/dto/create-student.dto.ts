@@ -34,4 +34,9 @@ export class CreateStudentDto extends CreateUserDto {
     @IsString()
     @IsOptional()
     parentAddress: string;
+
+    @ApiProperty({ description: 'Branch ID', example: 'branch_001' })
+    @IsString()
+    @IsNotEmpty()
+    branchId: string;
 }

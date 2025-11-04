@@ -12,6 +12,8 @@ import { BranchModule } from './branch/branch.module';
 import { BranchManagerModule } from './branch-manager/branch-manager.module';
 import { ParentModule } from './parent/parent.module';
 import { MailModule } from './mail/mail.module';
+import { CourseModule } from './course/course.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { MailModule } from './mail/mail.module';
     BranchModule,
     BranchManagerModule,
     ParentModule,
+    CourseModule,
+    AdminModule,
   ],
   providers: [
     {

@@ -38,4 +38,10 @@ export class CreateStaffDto extends CreateUserDto {
     @IsEnum(DEGREES)
     @IsNotEmpty()
     degree: DegreeType;
+
+    @ApiProperty({ required: false })
+    @ValidateIf(o => o.staffType === 'branch_manager')
+    @IsString()
+    @IsNotEmpty()
+    branchId: string;
 }
