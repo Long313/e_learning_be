@@ -1,22 +1,20 @@
-import { Process, Processor } from '@nestjs/bull';
-import type { Job } from 'bull';
+import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
-@Processor('mail')
-export class MailProcessor {
+@Injectable()
+export class MailService {
   private transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
     port: Number(process.env.MAIL_PORT) || 587,
-    secure: false,
+    secure: false, // true nếu port là 465
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
   });
 
-  @Process('sendActivation')
-  async handleSendActivation(job: Job<{ to: string; name: string; activationLink: string }>) {
-    const { to, name, activationLink } = job.data;
+  async sendActivationEmail(params: { to: string; name: string; activationLink: string }) {
+    const { to, name, activationLink } = params;
 
     await this.transporter.sendMail({
       from: process.env.MAIL_FROM || process.env.MAIL_USER,
@@ -31,9 +29,8 @@ export class MailProcessor {
     });
   }
 
-  @Process('sendPasswordReset')
-  async handleSendPasswordReset(job: Job<{ to: string; name: string; resetLink: string }>) {
-    const { to, name, resetLink } = job.data;
+  async sendPasswordResetEmail(params: { to: string; name: string; resetLink: string }) {
+    const { to, name, resetLink } = params;
 
     await this.transporter.sendMail({
       from: process.env.MAIL_FROM || process.env.MAIL_USER,

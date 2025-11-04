@@ -1,11 +1,11 @@
-import { Injectable , NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { paginate } from 'nestjs-typeorm-paginate';
-import { randomBytes, scrypt as _scrypt, hash } from 'crypto';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import type { UserType } from 'src/constants/user.constant';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -23,7 +23,7 @@ export class UserService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         private mailService: MailService,
-    ) {}
+    ) { }
 
     async createUser(body: CreateUserDto, manager?: EntityManager) {
         const repo = manager ? manager.getRepository(User) : this.userRepository;
@@ -38,7 +38,8 @@ export class UserService {
     async getAllUsersByType(type: string, paginationDto: PaginationDto) {
         const page = paginationDto.page ?? 1;
         const limit = paginationDto.limit ?? 10;
-        const queryBuilder = this.userRepository.createQueryBuilder('user')
+        const queryBuilder = this.userRepository
+            .createQueryBuilder('user')
             .where('user.userType = :type', { type });
 
         return paginate<User>(queryBuilder, { page, limit });
@@ -54,9 +55,9 @@ export class UserService {
     }
 
     async hashPassword(password: string) {
-    const salt = randomBytes(8).toString('hex');
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
-    return salt + '.' + hash.toString('hex');
+        const salt = randomBytes(8).toString('hex');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        return salt + '.' + hash.toString('hex');
     }
 
     async findByEmail(email: string) {
@@ -73,8 +74,8 @@ export class UserService {
             phoneNumber: dto.phoneNumber,
             address: dto.address,
             avatarUrl: dto.avatarUrl,
+            userType,
         };
-        userDto['userType'] = userType;
         return this.createUser(userDto, manager);
     }
 
@@ -108,21 +109,22 @@ export class UserService {
         }
 
         if (user.userType === 'student') {
-            const student = user.student
-           const userWithoutStudent = Object.assign(new User(), user);
+            const student = user.student;
+            const userWithoutStudent = Object.assign(new User(), user);
             return plainToInstance(
-                StudentResponseDto, 
-                {...student, user: userWithoutStudent},
-                { excludeExtraneousValues: true }
+                StudentResponseDto,
+                { ...student, user: userWithoutStudent },
+                { excludeExtraneousValues: true },
             );
         }
 
         if (user.userType === 'staff') {
             const staff = user.staff;
-            const userWithoutStaff = Object.assign(new User(), user); 
-            return plainToInstance(StaffResponseDto, 
-                {...staff, user: userWithoutStaff},
-                { excludeExtraneousValues: true }
+            const userWithoutStaff = Object.assign(new User(), user);
+            return plainToInstance(
+                StaffResponseDto,
+                { ...staff, user: userWithoutStaff },
+                { excludeExtraneousValues: true },
             );
         }
     }
@@ -130,22 +132,20 @@ export class UserService {
     async findById(id: string) {
         return this.userRepository.findOneBy({ id });
     }
-    
+
     async sendActivationEmail(user: User) {
-        const mailOptions = {
-           id: user.id,
-           email: user.email,
-              fullName: user.fullName,
-        };
-        await this.mailService.enqueueActivationEmail(mailOptions);
+        await this.mailService.sendActivationEmail({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+        });
     }
 
     async sendPasswordResetEmail(user: User) {
-        const mailOptions = {
-           id: user.id,
-           email: user.email,
-              fullName: user.fullName,
-        };
-        await this.mailService.enqueuePasswordResetEmail(mailOptions);
+        await this.mailService.sendPasswordResetEmail({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+        });
     }
 }

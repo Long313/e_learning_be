@@ -11,22 +11,15 @@ import { TeacherModule } from './teacher/teacher.module';
 import { BranchModule } from './branch/branch.module';
 import { BranchManagerModule } from './branch-manager/branch-manager.module';
 import { ParentModule } from './parent/parent.module';
-import { BullModule } from '@nestjs/bull';
 import { MailModule } from './mail/mail.module';
 import { CourseModule } from './course/course.module';
 import { AdminModule } from './admin/admin.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, envFilePath: '.env',
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT) || 6379,
-      },
+      isGlobal: true,
+      envFilePath: '.env',
     }),
     MailModule,
     TypeOrmModule.forRoot({
@@ -41,7 +34,9 @@ import { AdminModule } from './admin/admin.module';
       retryAttempts: 10,
       retryDelay: 3000,
       logging: true,
-      // dropSchema: true,
+      ssl: process.env.DB_SSL === 'true'
+        ? { rejectUnauthorized: false }
+        : false,
     }),
     AuthModule,
     StudentModule,
@@ -54,9 +49,11 @@ import { AdminModule } from './admin/admin.module';
     CourseModule,
     AdminModule,
   ],
-  providers: [{
-    provide: APP_INTERCEPTOR,
-    useClass: TransformInterceptor
-  }]
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+  ],
 })
 export class AppModule { }

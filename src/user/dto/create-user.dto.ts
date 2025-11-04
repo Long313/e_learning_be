@@ -1,14 +1,14 @@
-import {IsString, IsDate, IsEmail, IsNotEmpty, IsEnum} from 'class-validator';
+import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { GENDERS} from '../../constants/user.constant';
-import type {UserType, GenderType} from '../../constants/user.constant';
+import { GENDERS } from '../../constants/user.constant';
+import type { UserType, GenderType } from '../../constants/user.constant';
 import { Type } from 'class-transformer';
 
 export class CreateUserDto {
-    @ApiProperty(        {
-            description: 'User email address',
-            example: 'vanphuoc1028@gmail.com',
-        })
+    @ApiProperty({
+        description: 'User email address',
+        example: 'tranxuanlonga555@gmail.com',
+    })
     @IsEmail()
     @IsNotEmpty()
     email: string;
@@ -29,7 +29,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     fullName: string;
 
-    @ApiProperty({enum: GENDERS})
+    @ApiProperty({ enum: GENDERS })
     @IsEnum(GENDERS)
     @IsNotEmpty()
     gender: GenderType;
@@ -64,4 +64,14 @@ export class CreateUserDto {
     })
     @IsString()
     avatarUrl?: string;
+
+    // ✅ Thêm trường userType để fix lỗi
+    @ApiProperty({
+        description: 'Type of user (student, staff, admin)',
+        enum: ['student', 'staff', 'admin'],
+        example: 'student',
+    })
+    @IsEnum(['student', 'staff', 'admin'])
+    @IsNotEmpty()
+    userType: UserType;
 }
