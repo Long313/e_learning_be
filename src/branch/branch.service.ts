@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,15 +26,28 @@ export class BranchService {
     return paginate<Branch>(queryBuilder, { page, limit });
   }
 
-  findOne(id: string) {
-    return this.branchRepository.findOneBy({ id });
+  async findOne(id: string) {
+    const branch = await this.branchRepository.findOneBy({ id });
+    if (!branch) {
+      throw new NotFoundException(`Branch with ID ${id} not found`);
+    }
+    return branch;
   }
 
-  update(id: string, updateBranchDto: UpdateBranchDto) {
-    return this.branchRepository.update(id, updateBranchDto);
+  async update(id: string, updateBranchDto: UpdateBranchDto) {
+    const result = await this.branchRepository.update(id, updateBranchDto);
+    if (!result.affected) {
+      throw new NotFoundException(`Branch with ID ${id} not found`);
+    }
+    return result;
   }
+  
 
-  remove(id: string) {
+  async remove(id: string) {
+    const branch = await this.findOne(id);
+    if (!branch) {
+      throw new NotFoundException(`Branch with ID ${id} not found`);
+    }
     return this.branchRepository.delete(id);
   }
 }

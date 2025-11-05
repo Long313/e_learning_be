@@ -1,6 +1,6 @@
 import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { GENDERS } from '../../constants/user.constant';
+import { GENDERS, USER_TYPES } from '../../constants/user.constant';
 import type { UserType, GenderType } from '../../constants/user.constant';
 import { Type } from 'class-transformer';
 
@@ -68,10 +68,11 @@ export class CreateUserDto {
     // ✅ Thêm trường userType để fix lỗi
     @ApiProperty({
         description: 'Type of user (student, staff, admin)',
-        enum: ['student', 'staff', 'admin'],
+        enum: USER_TYPES,
         example: 'student',
     })
-    @IsEnum(['student', 'staff', 'admin'])
+    @IsEnum(USER_TYPES)
     @IsNotEmpty()
     userType: UserType;
+
 }

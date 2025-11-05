@@ -2,11 +2,11 @@ import { BranchManager } from 'src/branch-manager/entities/branch-manager.entity
 import { Student } from 'src/student/entities/student.entity';
 import { Entity, ManyToMany } from 'typeorm';
 import { Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, OneToMany } from 'typeorm';
-
+import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity('branches')
 
-export class Branch {
+export class Branch extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

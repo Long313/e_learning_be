@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException, UnauthorizedException, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
@@ -6,6 +6,8 @@ import { RefreshTokenDto, RevokeRefreshTokenDto } from './dto/refresh-token.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from 'src/common/decorators/public-api.decorator';
 import { ResetPasswordConfirmDto, ResetPasswordRequestDto } from './dto/reset-password.dto';
+import type { Response } from 'express';
+
 
 
 @ApiTags('Authentication')
@@ -21,12 +23,24 @@ export class AuthController {
   @Public()
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
-  async login(@Body() loginDto: LoginDto) {
+
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const { email, password } = loginDto;
     const token = await this.authService.login(email, password);
     if (!token) {
-      return { message: 'Invalid email or password' };
+      throw new UnauthorizedException('Invalid credentials');
     }
+    const { accessToken, refreshToken } = token;
+
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      expires: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+    });
     return token;
   }
 
@@ -34,9 +48,22 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
-  async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
+  async refreshAccessToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const { refreshToken } = refreshTokenDto;
-    return this.authService.refreshAccessToken(refreshToken);
+    const accessToken = await this.authService.refreshAccessToken(refreshToken);
+    if (!accessToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      expires: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+    });
+    return { accessToken };
   }
 
   @Post('logout')

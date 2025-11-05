@@ -1,9 +1,11 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToMany, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
+import { PrerequisiteCourse } from "./prerequisite-course.entity";
+import { BaseEntity } from "src/common/entities/base.entity";
 
 
 @Entity('courses')
-export class Course {
-    @Column('uuid')
+export class Course extends BaseEntity {
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column()
@@ -17,4 +19,8 @@ export class Course {
 
     @Column()
     price: number;
+
+    @OneToMany(() => PrerequisiteCourse, prerequisiteCourse => prerequisiteCourse.course)
+    prerequisiteCourses: PrerequisiteCourse[];
+    
 }

@@ -39,4 +39,14 @@ export class CreateStudentDto extends CreateUserDto {
     @IsString()
     @IsNotEmpty()
     branchId: string;
+
+    @ApiProperty({ description: 'Registered course ID', example: 'course_001' })
+    @IsString()
+    @IsNotEmpty()
+    courseId: string;
+
+    @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 }

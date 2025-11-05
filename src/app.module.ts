@@ -14,6 +14,7 @@ import { ParentModule } from './parent/parent.module';
 import { MailModule } from './mail/mail.module';
 import { CourseModule } from './course/course.module';
 import { AdminModule } from './admin/admin.module';
+import { CourseRegistrationModule } from './course-registration/course-registration.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AdminModule } from './admin/admin.module';
     ParentModule,
     CourseModule,
     AdminModule,
+    CourseRegistrationModule,
   ],
   providers: [
     {
