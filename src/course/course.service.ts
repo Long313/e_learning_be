@@ -1,26 +1,70 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Course } from './entities/course.entity';
+import { Repository } from 'typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class CourseService {
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  constructor(
+    @InjectRepository(Course) private courseRepository: Repository<Course>,
+
+  ) {}
+
+  async create(createCourseDto: CreateCourseDto) {
+    const { prerequisiteCourseIds, ...courseData } = createCourseDto;
+    let prerequisiteCourses: Course[] = [];
+    if (prerequisiteCourseIds?.length) {
+      prerequisiteCourses = await Promise.all(
+        prerequisiteCourseIds.map(async (id) => {
+          const course = await this.findOne(id);
+          if (!course) {
+            throw new Error(`Prerequisite course with ID ${id} not found`);
+          }
+          return course;
+        })
+
+      )
+    }
+
+    const course = this.courseRepository.create({
+      ...courseData,
+      prerequisiteCourses,
+    });
+    return this.courseRepository.save(course);
   }
 
-  findAll() {
-    return `This action returns all course`;
+  findAll(page: number, limit: number) {
+    const QueryBuilder = this.courseRepository.createQueryBuilder('course');
+    return paginate<Course>(QueryBuilder, { page, limit });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: string) {
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: ['prerequisiteCourses'],
+    });
+    if (!course) {
+      throw new Error(`Course with ID ${id} not found`);
+    }
+    return course;
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: string, updateCourseDto: UpdateCourseDto) {
+    const course = await this.findOne(id);
+    if (!course) {
+      throw new Error(`Course with ID ${id} not found`);
+    }
+    return this.courseRepository.update(id, updateCourseDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: string) {
+    const course = await this.findOne(id);
+    if (!course) {
+      throw new Error(`Course with ID ${id} not found`);
+    }
+    return this.courseRepository.delete(id);
   }
 }

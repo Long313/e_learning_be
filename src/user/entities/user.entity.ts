@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterRemove, AfterUpdate, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterRemove, AfterUpdate, OneToOne, JoinColumn, OneToMany, ManyToOne } from 'typeorm';
 import { USER_TYPES, GENDERS, STATUS, AssociatedEntity, ROLES_MAP} from '../../constants/user.constant';
 import { Student } from 'src/student/entities/student.entity';
 import { Exclude } from 'class-transformer';
@@ -63,22 +63,25 @@ export class User {
     createdAt: Date;
 
     @Exclude()
-    @Column({ type: 'uuid', nullable: true })
-    createdBy: string | null;
+    @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'created_by', referencedColumnName: 'id' })
+    createdBy: User | null;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
     @Exclude()
-    @Column({ type: 'uuid', nullable: true })
-    updatedBy: string | null;
+    @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'updated_by', referencedColumnName: 'id' })
+    updatedBy: User | null;
 
     @Column({ type: 'timestamp', nullable: true })
     deletedAt: Date | null;
 
     @Exclude()
-    @Column({ type: 'uuid', nullable: true })
-    deletedBy: string | null;
+    @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'deleted_by', referencedColumnName: 'id' })
+    deletedBy: User | null;
 
     // Relations
 

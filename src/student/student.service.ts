@@ -19,13 +19,17 @@ export class StudentService {
     private userService: UserService, 
     private parentService: ParentService,
     @InjectRepository(Student) private studentRepository: Repository<Student>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
     const existingUser = await this.userService.findByEmail(createStudentDto.email);
     if (existingUser) {
       throw new BadRequestException(`User with email ${createStudentDto.email} already exists`);
+    }
+    const course = await this.dataSource.getRepository('courses').findOneBy({ id: createStudentDto.courseId });
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${createStudentDto.courseId} not found`);
     }
     const result = await this.dataSource.transaction(async (manager) => {
       const user = await this.userService.createUserFromExtendedDto(createStudentDto, 'student', manager);
@@ -34,9 +38,17 @@ export class StudentService {
         user: user,
         schoolGrade: createStudentDto.schoolGrade,
         startDate: createStudentDto.startDate,
+        description: createStudentDto.description,
       });
 
       const savedStudent = await manager.save(Student, student);
+
+      const createCourseRegistrationDto = {
+        student: savedStudent,
+        course: course,
+        tuitionStatus: 'unpaid',
+      };
+      await manager.getRepository('course_registrations').save(createCourseRegistrationDto);
 
       await this.createParent(createStudentDto, manager, savedStudent);
 
@@ -70,11 +82,14 @@ export class StudentService {
     }
   }
 
-  findOne(id: string) {
-    const result = this.studentRepository.findOne({
+  async findOne(id: string) {
+    const result = await this.studentRepository.findOne({
       where: { id },
       relations: ['user'],
     });
+    if (!result) {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
     return plainToInstance(StudentResponseDto, result, { excludeExtraneousValues: true });
   }
 

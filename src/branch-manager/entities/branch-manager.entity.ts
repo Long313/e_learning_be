@@ -1,9 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, AfterInsert, AfterUpdate, AfterRemove, OneToOne, JoinColumn } from 'typeorm';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Staff } from 'src/staff/entities/staff.entity';
+import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity('branch_managers')
-export class BranchManager {
+export class BranchManager extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

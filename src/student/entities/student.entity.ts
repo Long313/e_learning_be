@@ -15,6 +15,9 @@ export class Student {
     @Column()
     startDate: Date;
 
+    @Column({ type: 'text', nullable: true })
+    description: string;
+
     @OneToOne(() => User, user => user.student, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: User;

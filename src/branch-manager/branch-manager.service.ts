@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBranchManagerDto } from './dto/create-branch-manager.dto';
 import { UpdateBranchManagerDto } from './dto/update-branch-manager.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,15 +17,27 @@ export class BranchManagerService {
     return paginate<BranchManager>(queryBuilder, { page, limit });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} branchManager`;
+  async findOne(id: string) {
+    const branchManager = await this.branchManagerRepository.findOneBy({ id });
+    if (!branchManager) {
+      throw new NotFoundException(`BranchManager with ID ${id} not found`);
+    }
+    return branchManager;
   }
 
-  update(id: string, updateBranchManagerDto: UpdateBranchManagerDto) {
-    return `This action updates a #${id} branchManager`;
+  async update(id: string, updateBranchManagerDto: UpdateBranchManagerDto) {
+    const result = await this.branchManagerRepository.update(id, updateBranchManagerDto);
+    if (!result.affected) {
+      throw new NotFoundException(`BranchManager with ID ${id} not found`);
+    }
+    return result;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} branchManager`;
+  async remove(id: string) {
+    const result = await this.branchManagerRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`BranchManager with ID ${id} not found`);
+    }
+    return result;
   }
 }
