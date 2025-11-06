@@ -42,6 +42,13 @@ async function bootstrap() {
     user: process.env.DB_USERNAME,
     db: process.env.DB_DATABASE,
   });
+  app.enableCors({
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.APP_URL,
+    ],
+    credentials: true,
+  });
   await app.listen(process.env.PORT ?? 4000);
   console.log(`🚀 Server đang chạy tại: http://localhost:${process.env.PORT ?? 4000}`);
   console.log(`📘 Swagger docs: http://localhost:${process.env.PORT ?? 4000}/api/docs`);
