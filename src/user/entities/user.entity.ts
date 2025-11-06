@@ -23,7 +23,8 @@ export class User {
 
     @Column({ 
         type: 'enum',
-        enum: GENDERS
+        enum: GENDERS,
+        nullable: true
     })
     gender: string;
 

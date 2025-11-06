@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Staff } from './entities/staff.entity';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { DataSource, EntityManager } from 'typeorm';
@@ -8,6 +8,7 @@ import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { CreateBranchManagerDto } from 'src/branch-manager/dto/create-branch-manager.dto';
 import { BranchManager } from 'src/branch-manager/entities/branch-manager.entity';
 import { Branch } from 'src/branch/entities/branch.entity';
+import { Course } from 'src/course/entities/course.entity';
 
 @Injectable()
 export class StaffService {
@@ -17,6 +18,26 @@ export class StaffService {
     ) {}
 
     async create(createStaffDto: CreateStaffDto) {
+        let branch: Branch | null = null;
+        if (createStaffDto.branchId) {
+            branch = await this.dataSource.getRepository(Branch).findOne({
+                where: { id: createStaffDto.branchId },
+            }) as Branch;
+            if (!branch) {
+                throw new NotFoundException('Branch not found');
+            }
+        }
+
+        let course: Course | null = null;
+        if (createStaffDto.courseId) {
+            course = await this.dataSource.getRepository(Course).findOne({
+                where: { id: createStaffDto.courseId },
+            }) as Course;
+            if (!course) {
+                throw new NotFoundException('Course not found');
+            }
+        }
+
         const user = await this.userService.findByEmail(createStaffDto.email);
         if (user) {
             throw new BadRequestException('Email already in use');
@@ -34,10 +55,10 @@ export class StaffService {
 
             switch (createStaffDto.staffType) {
                 case 'teacher':
-                    await this.createTeacher(createStaffDto, savedStaff, manager);
+                    await this.createTeacher(createStaffDto, savedStaff, manager, course as Course, branch as Branch);
                     break;
                 case 'branch_manager':
-                    await this.createBranchManager(createStaffDto, savedStaff, manager);
+                    await this.createBranchManager(savedStaff, manager, branch as Branch);
                     break;
                 default:
                     break;
@@ -60,24 +81,25 @@ export class StaffService {
         });
     }
 
-    private async createTeacher(createStaffDto: CreateStaffDto, staff: Staff, manager: EntityManager) {
+    private async createTeacher(createStaffDto: CreateStaffDto, staff: Staff, manager: EntityManager, course: Course, branch: Branch) {
         const createTeacherDto: CreateTeacherDto = {
             major: createStaffDto.major,
             academic_title: createStaffDto.academic_title,
             degree: createStaffDto.degree,
-            staff: staff
+            staff: staff,
+            branch: branch,
         };
 
+ 
         const teacher = manager.create(Teacher, createTeacherDto);
 
+        teacher.courses = [course];
+
         await manager.save(Teacher, teacher);
+
     }
 
-    private async createBranchManager(createStaffDto: CreateStaffDto, staff: Staff, manager: EntityManager) {
-        const branch = await manager.findOne(Branch, { where: { id: createStaffDto.branchId } });
-        if (!branch) {
-            throw new BadRequestException('Branch does not exist');
-        }
+    private async createBranchManager(staff: Staff, manager: EntityManager, branch: Branch) {
         const createBranchManagerDto: CreateBranchManagerDto = {
             staff: staff,
             branch: branch,

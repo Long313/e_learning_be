@@ -2,8 +2,17 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty, IsDate, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { OmitType } from '@nestjs/swagger';
 
-export class CreateStudentDto extends CreateUserDto {
+export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as const) {
+
+    @ApiProperty({
+        description: 'Student phone number',
+        example: '123-456-7890',
+    })
+    @IsString()
+    phoneNumber: string;
+
     @ApiProperty({ description: 'The grade of the student', example: 10 })
     @IsNumber()
     @IsNotEmpty()
@@ -47,6 +56,5 @@ export class CreateStudentDto extends CreateUserDto {
 
     @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
     @IsString()
-    @IsNotEmpty()
     description: string;
 }

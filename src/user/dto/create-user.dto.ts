@@ -31,7 +31,6 @@ export class CreateUserDto {
 
     @ApiProperty({ enum: GENDERS })
     @IsEnum(GENDERS)
-    @IsNotEmpty()
     gender: GenderType;
 
     @ApiProperty({
@@ -49,6 +48,7 @@ export class CreateUserDto {
         example: '123-456-7890',
     })
     @IsString()
+    @IsNotEmpty()
     phoneNumber: string;
 
     @ApiProperty({
