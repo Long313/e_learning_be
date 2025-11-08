@@ -9,17 +9,20 @@ import { StudentManagement } from 'src/student-management/entities/student-manag
 @Entity('branches')
 
 export class Branch extends BaseEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ unique: true })
     name: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, })
     address: string;
 
     @Column({ nullable: true })
     phone: string;
+
+    @Column({ nullable: true, unique: true })
+    code: string;
 
     @OneToMany(() => BranchManager, (manager) => manager.branch)
     managers: BranchManager[];

@@ -3,7 +3,6 @@ import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('admin')
@@ -24,17 +23,17 @@ export class AdminController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: number) {
     return this.adminService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateAdminDto: UpdateAdminDto) {
+  update(@Param('id') id: number, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.update(id, updateAdminDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id') id: number) {
     return this.adminService.remove(id);
   }
 }

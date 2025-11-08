@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, ManyToOne, JoinColumn, PrimaryGeneratedColumn, ManyToMany } from "typeorm";
+import { Column, Entity, OneToMany, ManyToOne, JoinColumn, PrimaryGeneratedColumn, ManyToMany, AfterInsert } from "typeorm";
 import { PrerequisiteCourse } from "./prerequisite-course.entity";
 import { BaseEntity } from "src/common/entities/base.entity";
 import { Teacher } from "src/teacher/entities/teacher.entity";
@@ -6,10 +6,10 @@ import { Teacher } from "src/teacher/entities/teacher.entity";
 
 @Entity('courses')
 export class Course extends BaseEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-    @Column()
+    @Column({unique: true})
     title: string;
 
     @Column()
@@ -20,6 +20,9 @@ export class Course extends BaseEntity {
 
     @Column()
     price: number;
+
+    @Column({ unique: true , nullable: true})
+    code: string;
 
     @ManyToMany(() => Teacher, teacher => teacher.courses)
     teachers: Teacher[];

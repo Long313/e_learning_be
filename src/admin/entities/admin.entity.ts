@@ -6,8 +6,8 @@ import { User } from "src/user/entities/user.entity";
 @Entity('admins')
 
 export class Admin {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column( {
         type: 'enum',

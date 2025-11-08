@@ -48,7 +48,7 @@ export class AdminService {
     return paginate<Admin>(queryBuilder, { page, limit });
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const result = await this.adminRepository.findOne({ where: { id }, relations: ['user'] });
     if (!result) {
       throw new NotFoundException(`Admin with ID ${id} not found`);
@@ -56,7 +56,7 @@ export class AdminService {
     return result;
   }
 
-  async update(id: string, updateAdminDto: UpdateAdminDto) {
+  async update(id: number, updateAdminDto: UpdateAdminDto) {
     const result = await this.adminRepository.update(id, updateAdminDto);
     if (!result.affected) {
       throw new NotFoundException(`Admin with ID ${id} not found`);
@@ -64,7 +64,7 @@ export class AdminService {
     return result;
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     const result = await this.adminRepository.delete(id);
     if (!result.affected) {
       throw new NotFoundException(`Admin with ID ${id} not found`);

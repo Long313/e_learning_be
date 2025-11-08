@@ -6,8 +6,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpd
 @Entity('students')
 
 export class Student {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     schoolGrade: number;

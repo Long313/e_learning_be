@@ -7,7 +7,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public-api.decorator';
-import { ParseUUIDPipe } from '@nestjs/common';
+;
 import type { BranchManagerFilters } from 'src/common/filters/filter';
 
 @ApiTags('branch-manager')
@@ -26,12 +26,12 @@ export class BranchManagerController extends PrivateController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: number) {
     return this.branchManagerService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateBranchManagerDto: UpdateBranchManagerDto) {
+  update(@Param('id') id: number, @Body() updateBranchManagerDto: UpdateBranchManagerDto) {
     return this.branchManagerService.update(id, updateBranchManagerDto);
   }
 }

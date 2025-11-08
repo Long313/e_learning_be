@@ -42,7 +42,7 @@ export class TeacherService {
         };
     }
 
-    async findById(id: string) {
+    async findById(id: number) {
         const user = await this.userRepository.findOne({
             where: { id },
             relations: ['staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch'],
@@ -53,7 +53,7 @@ export class TeacherService {
         return plainToInstance(StaffResponseDto, user, { excludeExtraneousValues: true });
     }
 
-    async update(id: string, updateTeacherDto: UpdateTeacherDto) {
+    async update(id: number, updateTeacherDto: UpdateTeacherDto) {
         const result = await this.userRepository.manager.transaction(async (manager) => {
             const user = await manager.findOne(User, {
             where: { id },

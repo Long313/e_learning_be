@@ -33,9 +33,9 @@ export class CreateCourseDto {
     price: number;
 
     @ApiProperty({
-        type: [String],
+        type: [Number],
         description: 'List of prerequisite course IDs',
         example: [],
     })
-    prerequisiteCourseIds: string[];
+    prerequisiteCourseIds: number[];
 }

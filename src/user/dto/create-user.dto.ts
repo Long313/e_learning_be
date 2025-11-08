@@ -32,7 +32,8 @@ export class CreateUserDto {
     @ApiProperty({ enum: GENDERS })
     @IsEnum(
         GENDERS,
-        { message: `gender must be one of the following values: ${Object.values(GENDERS).filter(v => typeof v === 'string').join(', ')}` })
+        { message: `gender must be one of the following values: ${Object.values(GENDERS).filter(v => typeof v === 'string').join(', ')}` }
+    )
     gender: GenderType;
 
     @ApiProperty({

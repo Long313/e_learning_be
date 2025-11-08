@@ -1,6 +1,6 @@
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsNotEmpty, IsDate, IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsDate, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OmitType } from '@nestjs/swagger';
 
@@ -45,15 +45,15 @@ export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as
     @IsOptional()
     parentAddress: string;
 
-    @ApiProperty({ description: 'Branch ID', example: '45d73fe1-f8f8-45b1-81e3-49111679184e' })
-    @IsUUID('4', { message: 'branchId must be a valid UUID' })
+    @ApiProperty({ description: 'Branch ID', example: '1' })
+    @IsNumber()
     @IsNotEmpty()
-    branchId: string;
+    branchId: number;
 
-    @ApiProperty({ description: 'Registered course ID', example: '3340bb7d-082e-4a8c-b544-5404f89c4793' })
-    @IsUUID('4', { message: 'courseId must be a valid UUID' })
+    @ApiProperty({ description: 'Registered course ID', example: '1' })
+    @IsNumber()
     @IsNotEmpty()
-    courseId: string;
+    courseId: number;
 
     @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
     @IsString()

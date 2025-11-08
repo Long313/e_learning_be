@@ -82,7 +82,7 @@ export class StudentService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const result = await this.studentRepository.findOne({
       where: { id },
       relations: ['user'],
@@ -93,7 +93,7 @@ export class StudentService {
     return plainToInstance(StudentResponseDto, result, { excludeExtraneousValues: true });
   }
 
-  async update(userId: string, updateStudentDto: UpdateStudentDto) {
+  async update(userId: number, updateStudentDto: UpdateStudentDto) {
     const student = await this.studentRepository.findOneBy({ user: { id: userId } });
     if (!student) {
       throw new NotFoundException(`Student with user ID ${userId} not found`);

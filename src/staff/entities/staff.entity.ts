@@ -7,8 +7,8 @@ import { StudentManagement } from "src/student-management/entities/student-manag
 
 @Entity('staffs')
 export class Staff {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Exclude()
     @Column()

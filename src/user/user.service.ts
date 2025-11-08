@@ -45,7 +45,7 @@ export class UserService {
         return paginate<User>(queryBuilder, { page, limit });
     }
 
-    async updateUserInfo(id: string, body: UpdateUserDto) {
+    async updateUserInfo(id: number, body: UpdateUserDto) {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
@@ -79,7 +79,7 @@ export class UserService {
         return this.createUser(userDto, manager);
     }
 
-    async updateUserFromExtendedDto(id: string, dto: any) {
+    async updateUserFromExtendedDto(id: number, dto: any) {
         const updateDto: UpdateUserDto = removeUndefinedFields<UpdateUserDto>({
             fullName: dto.fullName,
             gender: dto.gender,
@@ -92,7 +92,7 @@ export class UserService {
         return this.updateUserInfo(id, updateDto);
     }
 
-    async updateRefreshToken(userId: string, refreshToken: string) {
+    async updateRefreshToken(userId: number, refreshToken: string) {
         await this.userRepository.update(userId, { refreshToken });
     }
 
@@ -100,7 +100,7 @@ export class UserService {
         return this.userRepository.findOneBy({ refreshToken });
     }
 
-    async getProfile(userId: string) {
+    async getProfile(userId: number) {
         
         const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch'] });
         if (!user) {
@@ -128,7 +128,7 @@ export class UserService {
         }
     }
 
-    async findById(id: string) {
+    async findById(id: number) {
         return this.userRepository.findOneBy({ id });
     }
 
@@ -148,7 +148,7 @@ export class UserService {
         });
     }
 
-    async changePassword(userId: string, newPassword: string) {
+    async changePassword(userId: number, newPassword: string) {
         this.userRepository.update(userId, { password: newPassword });
     }
 }

@@ -25,7 +25,7 @@ export class CourseRegistrationController {
 
   @Get(':id')
   findOne(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @CurrentUser() user: any,
   ) {
     if (!user) {
@@ -35,12 +35,12 @@ export class CourseRegistrationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseRegistrationDto: UpdateCourseRegistrationDto) {
+  update(@Param('id') id: number, @Body() updateCourseRegistrationDto: UpdateCourseRegistrationDto) {
     return this.courseRegistrationService.update(id, updateCourseRegistrationDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.courseRegistrationService.remove(+id);
   }
 }

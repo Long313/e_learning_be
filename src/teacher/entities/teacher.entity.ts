@@ -7,8 +7,8 @@ import { Course } from "src/course/entities/course.entity";
 
 @Entity('teachers')
 export class Teacher {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     major: string;
