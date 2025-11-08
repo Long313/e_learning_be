@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { ADMIN_TYPES } from "src/constants/user.constant";
 import type { AdminType } from "src/constants/user.constant";
 import { User } from "src/user/entities/user.entity";
@@ -16,5 +16,6 @@ export class Admin {
     type: AdminType;
 
     @OneToOne(() => User, user => user.admin, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' })
     user: User;
 }

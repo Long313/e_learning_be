@@ -23,12 +23,13 @@ export class User {
 
     @Column({ 
         type: 'enum',
-        enum: GENDERS
+        enum: GENDERS,
+        nullable: true
     })
     gender: string;
 
     @Column()
-    dayOfBirth: Date;
+    dateOfBirth: Date;
 
     @Column({ nullable: true })
     phoneNumber: string;
@@ -116,7 +117,7 @@ export class User {
 
     getAge(): number {
         const currentYear = new Date().getFullYear();
-        return currentYear - this.dayOfBirth.getFullYear();
+        return currentYear - this.dateOfBirth.getFullYear();
     }
 
     getRoles(): string[] {

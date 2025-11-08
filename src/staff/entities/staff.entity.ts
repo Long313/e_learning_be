@@ -3,6 +3,7 @@ import { User } from "src/user/entities/user.entity";
 import { Teacher } from "src/teacher/entities/teacher.entity";
 import { Exclude } from "class-transformer";
 import { BranchManager } from "src/branch-manager/entities/branch-manager.entity";
+import { StudentManagement } from "src/student-management/entities/student-management.entity";
 
 @Entity('staffs')
 export class Staff {
@@ -19,6 +20,9 @@ export class Staff {
 
     @OneToOne(() => Teacher, teacher => teacher.staff)
     teacher: Teacher;
+
+    @OneToOne(() => StudentManagement, studentManagement => studentManagement.staff)
+    studentManagement: StudentManagement;
 
     @OneToOne(() => BranchManager, branchManager => branchManager.staff)
     branchManager: BranchManager;
