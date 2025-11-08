@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -38,7 +38,7 @@ export class StudentController extends PrivateController {
   @ApiResponse({ status: 200, description: 'The student has been successfully retrieved.' })
   // @ApiBearerAuth('JWT-auth')
   // @Roles('admin', 'manager', 'student')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: number) {
     return this.studentService.findOne(id);
   }
 
@@ -47,7 +47,7 @@ export class StudentController extends PrivateController {
   @ApiResponse({ status: 200, description: 'The student has been successfully updated.' })
   // @ApiBearerAuth('JWT-auth')
   // @Roles('admin', 'manager', 'student')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateStudentDto: UpdateStudentDto) {
+  update(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }
 }

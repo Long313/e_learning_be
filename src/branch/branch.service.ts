@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,9 +14,20 @@ export class BranchService {
     private branchRepository: Repository<Branch>,
   ) {}
 
-  create(createBranchDto: CreateBranchDto) {
-    const branch = this.branchRepository.create(createBranchDto);
-    return this.branchRepository.save(branch);
+  async create(createBranchDto: CreateBranchDto) {
+    try {
+      const branch = this.branchRepository.create(createBranchDto);
+      await this.branchRepository.save(branch);
+      branch.code = `branch_${branch.id}`;
+      return await this.branchRepository.save(branch);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Branch with this name already exists');
+      }
+      console.error(error);
+      throw new InternalServerErrorException('Error creating branch');
+      
+    }
   }
 
   findAll(paginationDto: PaginationDto) {
@@ -26,7 +37,7 @@ export class BranchService {
     return paginate<Branch>(queryBuilder, { page, limit });
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const branch = await this.branchRepository.findOneBy({ id });
     if (!branch) {
       throw new NotFoundException(`Branch with ID ${id} not found`);
@@ -34,7 +45,7 @@ export class BranchService {
     return branch;
   }
 
-  async update(id: string, updateBranchDto: UpdateBranchDto) {
+  async update(id: number, updateBranchDto: UpdateBranchDto) {
     const result = await this.branchRepository.update(id, updateBranchDto);
     if (!result.affected) {
       throw new NotFoundException(`Branch with ID ${id} not found`);
@@ -43,7 +54,7 @@ export class BranchService {
   }
   
 
-  async remove(id: string) {
+  async remove(id: number) {
     const branch = await this.findOne(id);
     if (!branch) {
       throw new NotFoundException(`Branch with ID ${id} not found`);

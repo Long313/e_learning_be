@@ -26,7 +26,7 @@ export class CourseRegistrationService {
     return paginate<CourseRegistration>(queryBuilder, { page, limit });
   }
 
-  async findOne(id: string, user: any) {
+  async findOne(id: number, user: any) {
      const registration = await this.courseRegistrationRepository.findOne({
       where: { id },
       relations: ['student', 'student.user', 'course'],
@@ -50,7 +50,7 @@ export class CourseRegistrationService {
     return registration;
   }
 
-  update(id: string, updateCourseRegistrationDto: UpdateCourseRegistrationDto) {
+  update(id: number, updateCourseRegistrationDto: UpdateCourseRegistrationDto) {
     return `This action updates a #${id} courseRegistration`;
   }
 

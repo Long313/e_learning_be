@@ -7,8 +7,8 @@ import type { CourseRegistrationTuitionStatusType } from 'src/constants/course.c
 @Entity('course_registrations')
 
 export class CourseRegistration {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
   @ManyToOne(() => Student, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'studentId' })

@@ -7,7 +7,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public-api.decorator';
-import { ParseUUIDPipe } from '@nestjs/common';
 
 @ApiTags('branch')
 @Controller('branch')
@@ -29,17 +28,17 @@ export class BranchController extends PrivateController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: number) {
     return this.branchService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateBranchDto: UpdateBranchDto) {
+  update(@Param('id') id: number, @Body() updateBranchDto: UpdateBranchDto) {
     return this.branchService.update(id, updateBranchDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id') id: number) {
     return this.branchService.remove(id);
   }
 }

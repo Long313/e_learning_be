@@ -8,8 +8,8 @@ import { Admin } from 'src/admin/entities/admin.entity';
 export class User {
 
     // Columns
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ unique: true })
     email: string;
@@ -53,8 +53,8 @@ export class User {
     })
     userType: string;    
 
-    @Column({ type: 'uuid', nullable: true })
-    userTypeId: string;
+    @Column({ type: Number, nullable: true })
+    userTypeId: number;
 
     @Exclude()
     @Column({ unique: true, nullable: true })

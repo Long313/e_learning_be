@@ -6,8 +6,8 @@ import { Branch } from "src/branch/entities/branch.entity";
 @Entity('student_managements')
 
 export class StudentManagement {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @OneToOne(() => Staff, (staff) => staff.studentManagement)
     @JoinColumn({ name: 'staffId' })

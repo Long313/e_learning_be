@@ -40,7 +40,7 @@ export class BranchManagerService {
   }
   
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['staff', 'staff.branchManager', 'staff.branchManager.branch'],
@@ -51,7 +51,7 @@ export class BranchManagerService {
     return plainToInstance(StaffResponseDto, user, { excludeExtraneousValues: true });
   }
 
-  async update(id: string, updateBranchManagerDto: UpdateBranchManagerDto) {
+  async update(id: number, updateBranchManagerDto: UpdateBranchManagerDto) {
     const result = await this.userRepository.manager.transaction(async (manager: EntityManager) => {
       const user = await manager.findOne(User, {
         where: { id },

@@ -22,7 +22,7 @@ export class MailService {
   });
 
   /** 📩 Gửi email kích hoạt tài khoản */
-  async sendActivationEmail(user: { id: string; email: string; fullName?: string }) {
+  async sendActivationEmail(user: { id: number; email: string; fullName?: string }) {
     const expiresIn: JwtSignOptions['expiresIn'] =
       (process.env.JWT_ACTIVATION_EXPIRES ?? '24h') as JwtSignOptions['expiresIn'];
 
@@ -53,7 +53,7 @@ export class MailService {
   }
 
   /** 🔑 Gửi email đặt lại mật khẩu */
-  async sendPasswordResetEmail(user: { id: string; email: string; fullName?: string }) {
+  async sendPasswordResetEmail(user: { id: number; email: string; fullName?: string }) {
     const jti = randomUUID();
     const expiresIn: JwtSignOptions['expiresIn'] =
       (process.env.JWT_ACTIVATION_EXPIRES ?? '1h') as JwtSignOptions['expiresIn'];

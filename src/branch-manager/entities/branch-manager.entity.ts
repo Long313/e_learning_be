@@ -5,8 +5,8 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity('branch_managers')
 export class BranchManager extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => Branch, (branch) => branch.managers)
   branch: Branch;

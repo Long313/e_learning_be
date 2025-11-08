@@ -3,8 +3,8 @@ import { Course } from "./course.entity";
 
 @Entity('prerequisite_courses')
 export class PrerequisiteCourse {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne(() => Course, course => course.id, { onDelete: 'CASCADE' })
     course: Course;

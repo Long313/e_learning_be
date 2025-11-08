@@ -54,7 +54,7 @@ export class AuthService {
         }
     }
 
-    async revokeRefreshToken(userId: string) {
+    async revokeRefreshToken(userId: number) {
         await this.userService.updateRefreshToken(userId, '');
         return { message: 'Refresh token revoked successfully' };
     }
@@ -120,7 +120,7 @@ export class AuthService {
         return { message: 'Password reset successfully' };
     }
 
-    async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    async changePassword(userId: number, currentPassword: string, newPassword: string) {
         const user = await this.userService.findById(userId);
         if (!user) throw new NotFoundException('User not found');
 

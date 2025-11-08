@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param, ParseUUIDPipe, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Query, Param, Patch, Body } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import type { TeacherFilters } from 'src/common/filters/filter';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -21,7 +21,7 @@ export class TeacherController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a teacher by ID' })
   @ApiResponse({ status: 200, description: 'The teacher has been successfully retrieved.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id') id: number) {
     return this.teacherService.findById(id);
   }
 
@@ -29,7 +29,7 @@ export class TeacherController {
   @ApiOperation({ summary: 'Update a teacher by ID' })
   @ApiResponse({ status: 200, description: 'The teacher has been successfully updated.' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: number,
     @Body() updateTeacherDto: UpdateTeacherDto,
   ) {
     return this.teacherService.update(id, updateTeacherDto);
