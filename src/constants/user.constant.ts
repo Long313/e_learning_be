@@ -2,11 +2,11 @@ import { Staff } from "src/staff/entities/staff.entity";
 import { Student } from "src/student/entities/student.entity";
 
 const USER_TYPES = ['student', 'staff', 'admin'] as const;
-const GENDERS = ['nam', 'nữ', 'khác'] as const;
+const GENDERS = ['male', 'female', 'other'] as const;
 const STATUS = ['active', 'inactive', 'pending'] as const;
 const ACADEMIC_TITLES = ['Giáo sư', 'Phó giáo sư', null] as const;
 const DEGREES = ['Sinh viên', 'Cử nhân', 'Thạc sĩ', 'Tiến sĩ'] as const;
-const STAFF_TYPES = ['teacher', 'branch_manager'] as const;
+const STAFF_TYPES = ['teacher', 'branch_manager', 'student_management'] as const;
 const ADMIN_TYPES = ['super_admin', 'content_admin'] as const;
     
 

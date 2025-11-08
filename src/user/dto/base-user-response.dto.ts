@@ -8,7 +8,6 @@ export abstract class BaseUserResponseDto {
         example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.id)
     id: string;
 
     @ApiProperty({
@@ -16,7 +15,6 @@ export abstract class BaseUserResponseDto {
         example: 'user@example.com',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.email)
     email: string;
 
     @ApiProperty({
@@ -24,7 +22,6 @@ export abstract class BaseUserResponseDto {
         example: 'John Doe',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.fullName)
     fullName: string;
 
     @ApiProperty({
@@ -32,7 +29,6 @@ export abstract class BaseUserResponseDto {
         example: 'male',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.gender)
     gender: string;
 
     @ApiProperty({
@@ -41,15 +37,13 @@ export abstract class BaseUserResponseDto {
     })
     @Type(() => Date)
     @Expose()
-    @Transform(({ obj }) => obj.user?.dayOfBirth)
-    dayOfBirth: Date;
+    dateOfBirth: Date;
 
     @ApiProperty({
         description: 'User phone number',
         example: '123-456-7890',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.phoneNumber)
     phoneNumber: string;
 
     @ApiProperty({
@@ -57,7 +51,6 @@ export abstract class BaseUserResponseDto {
         example: '123 Main St, Anytown, USA',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.address)
     address?: string;
 
     @ApiProperty({
@@ -65,7 +58,6 @@ export abstract class BaseUserResponseDto {
         example: 'https://example.com/avatar.jpg',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.avatarUrl)
     avatarUrl?: string;
 
     @ApiProperty({
@@ -73,7 +65,6 @@ export abstract class BaseUserResponseDto {
         example: 'active',
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.status)
     status: string;
 
     @ApiProperty({
@@ -82,7 +73,6 @@ export abstract class BaseUserResponseDto {
         type: [String],
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.getRoles?.() || [], { toClassOnly: true })
     roles: string[];
 
     @ApiProperty({
@@ -90,7 +80,6 @@ export abstract class BaseUserResponseDto {
         example: 34,
     })
     @Expose()
-    @Transform(({ obj }) => obj.user?.getAge?.() || null, { toClassOnly: true })
     age: number;
 
     @ApiProperty({
@@ -99,7 +88,6 @@ export abstract class BaseUserResponseDto {
     })
     @Type(() => Date)
     @Expose()
-    @Transform(({ obj }) => obj.user?.createdAt)
     createdAt: Date;
 
     @ApiProperty({
@@ -108,6 +96,5 @@ export abstract class BaseUserResponseDto {
     })
     @Type(() => Date)
     @Expose()
-    @Transform(({ obj }) => obj.user?.updatedAt)
     updatedAt: Date;
 }

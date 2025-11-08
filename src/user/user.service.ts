@@ -70,7 +70,7 @@ export class UserService {
             password: dto.password,
             fullName: dto.fullName,
             gender: dto.gender,
-            dayOfBirth: dto.dayOfBirth,
+            dateOfBirth: dto.dateOfBirth,
             phoneNumber: dto.phoneNumber,
             address: dto.address,
             avatarUrl: dto.avatarUrl,
@@ -81,10 +81,9 @@ export class UserService {
 
     async updateUserFromExtendedDto(id: string, dto: any) {
         const updateDto: UpdateUserDto = removeUndefinedFields<UpdateUserDto>({
-            password: dto.password,
             fullName: dto.fullName,
             gender: dto.gender,
-            dayOfBirth: dto.dayOfBirth,
+            dateOfBirth: dto.dateOfBirth,
             phoneNumber: dto.phoneNumber,
             address: dto.address,
             avatarUrl: dto.avatarUrl,
@@ -147,5 +146,9 @@ export class UserService {
             email: user.email,
             fullName: user.fullName,
         });
+    }
+
+    async changePassword(userId: string, newPassword: string) {
+        this.userRepository.update(userId, { password: newPassword });
     }
 }

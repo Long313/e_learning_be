@@ -1,6 +1,6 @@
 import { Exclude, Expose, Type, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseUserResponseDto } from 'src/teacher/dto/base-user-response.dto';
+import { BaseUserResponseDto } from 'src/user/dto/base-user-response.dto';
 
 @Exclude()
 export class StudentResponseDto extends BaseUserResponseDto {

@@ -3,6 +3,8 @@ import { Student } from 'src/student/entities/student.entity';
 import { Entity, ManyToMany } from 'typeorm';
 import { Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/common/entities/base.entity';
+import { Teacher } from 'src/teacher/entities/teacher.entity';
+import { StudentManagement } from 'src/student-management/entities/student-management.entity';
 
 @Entity('branches')
 
@@ -24,6 +26,12 @@ export class Branch extends BaseEntity {
 
     @OneToMany(() => Student, (student) => student.branch)
     students: Student[];
+
+    @OneToMany(() => Teacher, (teacher) => teacher.branch)
+    teachers: Teacher[];
+
+    @OneToMany(() => StudentManagement, (studentManagement) => studentManagement.branch)
+    studentManagements: StudentManagement[];
 
     @AfterInsert()
     logInsert() {

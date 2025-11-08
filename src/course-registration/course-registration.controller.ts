@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UnauthorizedException } from '@nestjs/common';
 import { CourseRegistrationService } from './course-registration.service';
 import { CreateCourseRegistrationDto } from './dto/create-course-registration.dto';
 import { UpdateCourseRegistrationDto } from './dto/update-course-registration.dto';
@@ -28,6 +28,9 @@ export class CourseRegistrationController {
     @Param('id') id: string,
     @CurrentUser() user: any,
   ) {
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     return this.courseRegistrationService.findOne(id, user);
   }
 

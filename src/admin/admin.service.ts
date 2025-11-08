@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { DataSource, Repository } from 'typeorm';
@@ -15,7 +15,11 @@ export class AdminService {
     @InjectRepository(Admin) private readonly adminRepository: Repository<Admin>,
   ) {}
 
-  create(createAdminDto: CreateAdminDto) {
+  async create(createAdminDto: CreateAdminDto) {
+    const existingUser = await this.userService.findByEmail(createAdminDto.email);
+    if (existingUser) {
+      throw new BadRequestException(`User with email ${createAdminDto.email} already exists`);
+    }
     const manager = this.dataSource.manager;
     return manager.transaction(async transactionalEntityManager => {
       const user = transactionalEntityManager.create('User', {
@@ -23,7 +27,7 @@ export class AdminService {
         password: this.userService.hashPassword(createAdminDto.password),
         fullName: createAdminDto.fullName,
         gender: createAdminDto.gender,
-        dayOfBirth: createAdminDto.dayOfBirth,
+        dateOfBirth: createAdminDto.dateOfBirth,
         status: 'active',
         userType: 'admin',
       });

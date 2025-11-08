@@ -8,4 +8,7 @@ export class PrerequisiteCourse {
 
     @ManyToOne(() => Course, course => course.id, { onDelete: 'CASCADE' })
     course: Course;
+
+    @ManyToOne(() => Course, course => course.id, { onDelete: 'CASCADE' })
+    prerequisite: Course;
 }

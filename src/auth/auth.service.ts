@@ -115,8 +115,21 @@ export class AuthService {
         if (!user) throw new NotFoundException('User not found');
 
         const hashedPassword = await this.userService.hashPassword(newPassword);
-        await this.userService.updateUserInfo(user.id, { password: hashedPassword });
+        await this.userService.changePassword(user.id, hashedPassword);
 
         return { message: 'Password reset successfully' };
+    }
+
+    async changePassword(userId: string, currentPassword: string, newPassword: string) {
+        const user = await this.userService.findById(userId);
+        if (!user) throw new NotFoundException('User not found');
+
+        const passwordMatch = await this.comparePassword(user.password, currentPassword);
+        if (!passwordMatch) throw new UnauthorizedException('Current password is incorrect');
+
+        const hashedPassword = await this.userService.hashPassword(newPassword);
+        await this.userService.changePassword(userId, hashedPassword);
+
+        return { message: 'Password changed successfully' };
     }
 }
