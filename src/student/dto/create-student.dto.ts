@@ -47,6 +47,6 @@ export class CreateStudentDto extends CreateUserDto {
 
     @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     description: string;
 }

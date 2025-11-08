@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum } from 'class-validator';
+import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { GENDERS, USER_TYPES } from '../../constants/user.constant';
 import type { UserType, GenderType } from '../../constants/user.constant';
@@ -31,7 +31,6 @@ export class CreateUserDto {
 
     @ApiProperty({ enum: GENDERS })
     @IsEnum(GENDERS)
-    @IsNotEmpty()
     gender: GenderType;
 
     @ApiProperty({
@@ -49,6 +48,7 @@ export class CreateUserDto {
         example: '123-456-7890',
     })
     @IsString()
+    @IsOptional()
     phoneNumber: string;
 
     @ApiProperty({
@@ -56,6 +56,7 @@ export class CreateUserDto {
         example: '123 Main St, Anytown, USA',
     })
     @IsString()
+    @IsOptional()
     address?: string;
 
     @ApiProperty({
@@ -63,6 +64,7 @@ export class CreateUserDto {
         example: 'https://example.com/avatar.jpg',
     })
     @IsString()
+    @IsOptional()
     avatarUrl?: string;
 
     // ✅ Thêm trường userType để fix lỗi
