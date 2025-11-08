@@ -11,6 +11,7 @@ export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as
         example: '123-456-7890',
     })
     @IsString()
+    @IsOptional()
     phoneNumber: string;
 
     @ApiProperty({ description: 'The grade of the student', example: 10 })

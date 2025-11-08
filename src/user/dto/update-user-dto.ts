@@ -8,6 +8,9 @@ export class UpdateUserDto extends PartialType( OmitType(CreateUserDto, ['email'
     @ApiProperty({ description: 'The user\'s status', example: 'active', required: false })
     @IsOptional()
     @IsString()
-    @IsEnum(STATUS)
+    @IsEnum(
+        STATUS,
+        { message: `status must be one of the following values: ${Object.values(STATUS).filter(v => typeof v === 'string').join(', ')}` }
+    )
     status?: StatusType;
 }
