@@ -38,8 +38,7 @@ import { StudentManagementModule } from './student-management/student-management
       logging: true,
       ssl: process.env.DB_SSL === 'true'
         ? { rejectUnauthorized: false }
-        : false,
-      dropSchema: true
+        : false
     }),
     AuthModule,
     StudentModule,
