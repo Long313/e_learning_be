@@ -15,6 +15,7 @@ import { MailModule } from './mail/mail.module';
 import { CourseModule } from './course/course.module';
 import { AdminModule } from './admin/admin.module';
 import { CourseRegistrationModule } from './course-registration/course-registration.module';
+import { StudentManagementModule } from './student-management/student-management.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CourseRegistrationModule } from './course-registration/course-registrat
     CourseModule,
     AdminModule,
     CourseRegistrationModule,
+    StudentManagementModule,
   ],
   providers: [
     {

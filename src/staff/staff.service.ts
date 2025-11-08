@@ -9,6 +9,7 @@ import { CreateBranchManagerDto } from 'src/branch-manager/dto/create-branch-man
 import { BranchManager } from 'src/branch-manager/entities/branch-manager.entity';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Course } from 'src/course/entities/course.entity';
+import { StudentManagement } from 'src/student-management/entities/student-management.entity';
 
 @Injectable()
 export class StaffService {
@@ -60,6 +61,9 @@ export class StaffService {
                 case 'branch_manager':
                     await this.createBranchManager(savedStaff, manager, branch as Branch);
                     break;
+                case 'student_management':
+                    await this.createStudentManagement(savedStaff, manager, branch as Branch);
+                    break;
                 default:
                     break;
             }
@@ -68,23 +72,19 @@ export class StaffService {
                 userTypeId: savedStaff.id,
             });
 
-            const staffWithRelations = await manager.findOne(Staff, {
-                where: { id: savedStaff.id },
-                relations: ['user', 'teacher', 'branchManager', 'branchManager.branch'],
+            const userWithRelations = await manager.getRepository('users').findOne({
+                where: { id: user.id },
+                relations: ['staff', 'staff.teacher', 'staff.teacher.branch' , 'staff.branchManager', 'staff.branchManager.branch', 'staff.studentManagement', 'staff.studentManagement.branch'],
             });
 
-            if (staffWithRelations?.user) {
-                staffWithRelations.user.staff = staffWithRelations;
-            }
-
-            return staffWithRelations;
+            return userWithRelations;
         });
     }
 
     private async createTeacher(createStaffDto: CreateStaffDto, staff: Staff, manager: EntityManager, course: Course, branch: Branch) {
         const createTeacherDto: CreateTeacherDto = {
             major: createStaffDto.major,
-            academic_title: createStaffDto.academic_title,
+            academicTitle: createStaffDto.academicTitle,
             degree: createStaffDto.degree,
             staff: staff,
             branch: branch,
@@ -107,5 +107,13 @@ export class StaffService {
         const bm = manager.create(BranchManager, createBranchManagerDto);
 
         await manager.save(BranchManager, bm);
+    }
+
+    private async createStudentManagement(staff: Staff, manager: EntityManager, branch: Branch) {
+        const studentManagement = manager.create(StudentManagement, {
+            staff: staff,
+            branch: branch,
+        });
+        await manager.save(StudentManagement, studentManagement);
     }
 }

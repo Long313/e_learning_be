@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { BaseUserResponseDto } from 'src/teacher/dto/base-user-response.dto';
+import { BaseUserResponseDto } from 'src/user/dto/base-user-response.dto';
 
 
 @Exclude()
@@ -16,14 +16,21 @@ export class TeacherInfoDto {
     @ApiProperty({ description: 'Degree', example: 'Tiến sĩ' })
     @Expose()
     degree: string;
+
+    @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
+    @Expose()
+    branchName: string;    
 }
 
 @Exclude()
 export class BranchManagerInfoDto {
-    @ApiProperty({ description: 'Branch ID', example: 'branch-id' })
+    @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
     @Expose()
-    branchId: string;
+    branchName: string;
+}
 
+@Exclude()
+export class StudentManagementInfoDto {
     @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
     @Expose()
     branchName: string;
@@ -38,7 +45,17 @@ export class StaffResponseDto extends BaseUserResponseDto {
     })
     @Expose()
     @Type(() => TeacherInfoDto)
-    @Transform(({ obj }) => obj.teacher || null)
+    @Transform(({ obj }) => {
+        if (obj.staff?.teacher && obj.staff?.teacher?.branch) {
+            return {
+                major: obj.staff.teacher.major,
+                academic_title: obj.staff.teacher.academicTitle,
+                degree: obj.staff.teacher.degree,
+                branchName: obj.staff.teacher.branch.name,
+            };
+        }
+        return undefined;
+    })
     teacher?: TeacherInfoDto | null;
 
     @ApiProperty({
@@ -49,13 +66,30 @@ export class StaffResponseDto extends BaseUserResponseDto {
     @Expose()
     @Type(() => BranchManagerInfoDto)
     @Transform(({ obj }) => {
-        if (obj.branchManager && obj.branchManager.branch) {
+        if (obj.staff?.branchManager && obj.staff?.branchManager?.branch) {
             return {
-                branchId: obj.branchManager.branch.id,
-                branchName: obj.branchManager.branch.name,
+                branchId: obj.staff.branchManager.branch.id,
+                branchName: obj.staff.branchManager.branch.name,
             };
         }
-        return null;
+        return undefined;
     })
     branchManager?: BranchManagerInfoDto | null;
+
+    @ApiProperty({
+        description: 'Student Management information if staff is a student management',
+        type: StudentManagementInfoDto,
+        required: false,
+    })
+    @Expose()
+    @Type(() => StudentManagementInfoDto)
+    @Transform(({ obj }) => {
+        if (obj.staff?.studentManagement && obj.staff?.studentManagement?.branch) {
+            return {
+                branchName: obj.staff.studentManagement.branch.name,
+            };
+        }
+        return undefined;
+    })
+    studentManagement?: StudentManagementInfoDto | null;
 }

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get } from '@nestjs/common';
+import { Controller, UseGuards, Get, UnauthorizedException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -17,6 +17,9 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'Profile retrieved successfully.' })
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     async getProfile(@CurrentUser() user) {
+        if (!user) {
+            throw new UnauthorizedException();
+        }
         return this.userService.getProfile(user.userId);
     }
 }

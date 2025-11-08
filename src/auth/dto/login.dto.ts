@@ -16,3 +16,19 @@ export class LoginDto {
     @IsString()
     password: string;
 }
+
+export class changePasswordDto {
+    @ApiProperty({
+        description: 'Current user password',
+        example: 'currentPassword123',
+    })
+    @IsString()
+    currentPassword: string;
+
+    @ApiProperty({
+        description: 'New user password',
+        example: 'newPassword123',
+    })
+    @IsString()
+    newPassword: string;
+}

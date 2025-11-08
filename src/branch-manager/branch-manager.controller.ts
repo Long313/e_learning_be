@@ -8,6 +8,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/common/decorators/public-api.decorator';
 import { ParseUUIDPipe } from '@nestjs/common';
+import type { BranchManagerFilters } from 'src/common/filters/filter';
 
 @ApiTags('branch-manager')
 // @Roles('admin')
@@ -20,7 +21,7 @@ export class BranchManagerController extends PrivateController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: PaginationDto, @Query() filters?: BranchManagerFilters) {
     return this.branchManagerService.findAll(paginationDto);
   }
 

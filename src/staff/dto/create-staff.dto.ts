@@ -31,7 +31,7 @@ export class CreateStaffDto extends CreateUserDto {
     @ApiProperty({ required: false, enum: ACADEMIC_TITLES })
     @ValidateIf(o => o.staffType === 'teacher')
     @IsEnum(ACADEMIC_TITLES)
-    academic_title: AcademicTitleType;
+    academicTitle: AcademicTitleType;
 
     @ApiProperty({ required: false, enum: DEGREES })
     @ValidateIf(o => o.staffType === 'teacher')

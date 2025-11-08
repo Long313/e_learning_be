@@ -17,7 +17,7 @@ export class Teacher {
         type: 'enum',
         enum: ACADEMIC_TITLES
     })
-    academic_title: string | null;
+    academicTitle: string | null;
 
     @Column({   
         type: 'enum',

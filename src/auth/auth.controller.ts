@@ -1,12 +1,13 @@
 import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException, UnauthorizedException, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { changePasswordDto, LoginDto } from './dto/login.dto';
 import { RefreshTokenDto, RevokeRefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from 'src/common/decorators/public-api.decorator';
 import { ResetPasswordConfirmDto, ResetPasswordRequestDto } from './dto/reset-password.dto';
 import type { Response } from 'express';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 
 
@@ -119,5 +120,25 @@ export class AuthController {
       throw new BadRequestException('Token and new password are required');
     }
     return this.authService.resetPassword(token, newPassword);
+  }
+
+  @Post('change-password')
+  @ApiResponse({ status: 200, description: 'Password has been changed successfully.' })
+  @ApiOperation({ summary: 'Change password for authenticated user' })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Body() changePasswordDto: changePasswordDto,
+    @CurrentUser() user: any,
+  ) {
+    const { currentPassword, newPassword } = changePasswordDto;
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestException('Current password and new password are required');
+    }
+    const userId = user.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.authService.changePassword(userId, currentPassword, newPassword);
   }
 }

@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum } from 'class-validator';
+import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { GENDERS, USER_TYPES } from '../../constants/user.constant';
 import type { UserType, GenderType } from '../../constants/user.constant';
@@ -41,7 +41,7 @@ export class CreateUserDto {
     @Type(() => Date)
     @IsDate()
     @IsNotEmpty()
-    dayOfBirth: Date;
+    dateOfBirth: Date;
 
     @ApiProperty({
         description: 'User phone number',
@@ -62,7 +62,7 @@ export class CreateUserDto {
         description: 'User avatar URL',
         example: 'https://example.com/avatar.jpg',
     })
-    @IsString()
+    @IsUrl()
     avatarUrl?: string;
 
     // ✅ Thêm trường userType để fix lỗi
