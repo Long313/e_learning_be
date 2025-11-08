@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum, IsUrl } from 'class-validator';
+import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum, IsUrl, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { GENDERS, USER_TYPES } from '../../constants/user.constant';
 import type { UserType, GenderType } from '../../constants/user.constant';
@@ -30,7 +30,9 @@ export class CreateUserDto {
     fullName: string;
 
     @ApiProperty({ enum: GENDERS })
-    @IsEnum(GENDERS)
+    @IsEnum(
+        GENDERS,
+        { message: `gender must be one of the following values: ${Object.values(GENDERS).filter(v => typeof v === 'string').join(', ')}` })
     gender: GenderType;
 
     @ApiProperty({
@@ -63,6 +65,7 @@ export class CreateUserDto {
         example: 'https://example.com/avatar.jpg',
     })
     @IsUrl()
+    @IsOptional()
     avatarUrl?: string;
 
     // ✅ Thêm trường userType để fix lỗi

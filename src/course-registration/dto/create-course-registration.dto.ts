@@ -11,6 +11,9 @@ export class CreateCourseRegistrationDto {
   @IsNotEmpty()
   course: Course;
 
-  @IsEnum(COURSE_REGISTRATION_TUITION_STATUS)
+  @IsEnum(
+    COURSE_REGISTRATION_TUITION_STATUS,
+    { message: `tuitionStatus must be one of the following values: ${Object.values(COURSE_REGISTRATION_TUITION_STATUS).filter(v => typeof v === 'string').join(', ')}` }
+  )
   tuitionStatus: CourseRegistrationTuitionStatusType;
 }
