@@ -59,10 +59,10 @@ export class CreateStaffDto extends CreateUserDto {
     @ApiProperty({ required: false })
     @ValidateIf(o => o.staffType === 'branch_manager' || o.staffType === 'teacher')
     @IsNotEmpty()
-    branchId: number;
+    branchCode: string;
 
     @ApiProperty({ required: false })
     @ValidateIf(o => o.staffType === 'teacher')
     @IsNotEmpty()
-    courseId: number;
+    courseCode: string;
 }

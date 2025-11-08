@@ -20,9 +20,9 @@ export class StaffService {
 
     async create(createStaffDto: CreateStaffDto) {
         let branch: Branch | null = null;
-        if (createStaffDto.branchId) {
+        if (createStaffDto.branchCode) {
             branch = await this.dataSource.getRepository(Branch).findOne({
-                where: { id: createStaffDto.branchId },
+                where: { code: createStaffDto.branchCode },
             }) as Branch;
             if (!branch) {
                 throw new NotFoundException('Branch not found');
@@ -30,9 +30,9 @@ export class StaffService {
         }
 
         let course: Course | null = null;
-        if (createStaffDto.courseId) {
+        if (createStaffDto.courseCode) {
             course = await this.dataSource.getRepository(Course).findOne({
-                where: { id: createStaffDto.courseId },
+                where: { code: createStaffDto.courseCode },
             }) as Course;
             if (!course) {
                 throw new NotFoundException('Course not found');

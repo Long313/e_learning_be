@@ -45,15 +45,15 @@ export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as
     @IsOptional()
     parentAddress: string;
 
-    @ApiProperty({ description: 'Branch ID', example: '1' })
-    @IsNumber()
+    @ApiProperty({ description: 'Branch code', example: 'branch_1' })
+    @IsString()
     @IsNotEmpty()
-    branchId: number;
+    branchCode: string;
 
-    @ApiProperty({ description: 'Registered course ID', example: '1' })
-    @IsNumber()
+    @ApiProperty({ description: 'Registered course code', example: 'course_1' })
+    @IsString()
     @IsNotEmpty()
-    courseId: number;
+    courseCode: string;
 
     @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
     @IsString()

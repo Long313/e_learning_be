@@ -11,6 +11,7 @@ import { removeUndefinedFields } from 'src/common/helpers';
 import { StudentResponseDto } from './dto/student-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { ParentService } from 'src/parent/parent.service';
+import { User } from 'src/user/entities/user.entity';
 
 
 @Injectable()
@@ -27,15 +28,21 @@ export class StudentService {
     if (existingUser) {
       throw new BadRequestException(`User with email ${createStudentDto.email} already exists`);
     }
-    const course = await this.dataSource.getRepository('courses').findOneBy({ id: createStudentDto.courseId });
+    const course = await this.dataSource.getRepository('courses').findOneBy({ code: createStudentDto.courseCode });
     if (!course) {
-      throw new NotFoundException(`Course with ID ${createStudentDto.courseId} not found`);
+      throw new NotFoundException(`Course with code ${createStudentDto.courseCode} not found`);
+    }
+
+    const branch = await this.dataSource.getRepository('branches').findOneBy({ code: createStudentDto.branchCode });
+    if (!branch) {
+      throw new NotFoundException(`Branch with code ${createStudentDto.branchCode} not found`);
     }
     const result = await this.dataSource.transaction(async (manager) => {
       const user = await this.userService.createUserFromExtendedDto(createStudentDto, 'student', manager);
 
       const student = manager.create(Student, {
         user: user,
+        branch: branch,
         schoolGrade: createStudentDto.schoolGrade,
         startDate: createStudentDto.startDate,
         description: createStudentDto.description,
@@ -56,16 +63,16 @@ export class StudentService {
         userTypeId: savedStudent.id,
       });
 
-      const studentWithUser = await manager.findOne(Student, {
-        where: { id: savedStudent.id },
-        relations: ['user'],
+      const userWithStudent = await manager.findOne(User, {
+        where: { id: user.id },
+        relations: ['student'],
       });
 
-      return { studentWithUser, user }
+      return { userWithStudent, user }
       });
 
-      await this.userService.sendActivationEmail(result.user);
-      return plainToInstance(StudentResponseDto, result.studentWithUser, { excludeExtraneousValues: true });
+      this.userService.sendActivationEmail(result.user);
+      return plainToInstance(StudentResponseDto, result.userWithStudent, { excludeExtraneousValues: true });
   }
 
   async findAll(paginationDto: PaginationDto) {
