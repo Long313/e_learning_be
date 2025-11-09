@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty, IsDate, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OmitType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as const) {
 
@@ -43,6 +44,7 @@ export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as
     @ApiProperty({ description: 'Student parent\'s address', example: '123 Main St, City, Country' })
     @IsString()
     @IsOptional()
+    @Transform(({ value }) => value === '' ? undefined : value)
     parentAddress: string;
 
     @ApiProperty({ description: 'Branch code', example: 'branch_1' })
@@ -57,5 +59,6 @@ export class CreateStudentDto extends OmitType(CreateUserDto, ['phoneNumber'] as
 
     @ApiProperty({ description: 'Description', example: 'Enrolled for advanced mathematics course' })
     @IsString()
+    @IsOptional()
     description: string;
 }
