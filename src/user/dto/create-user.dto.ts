@@ -2,7 +2,7 @@ import { IsString, IsDate, IsEmail, IsNotEmpty, IsEnum, IsUrl, IsOptional } from
 import { ApiProperty } from '@nestjs/swagger';
 import { GENDERS, USER_TYPES } from '../../constants/user.constant';
 import type { UserType, GenderType } from '../../constants/user.constant';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateUserDto {
     @ApiProperty({
@@ -59,6 +59,8 @@ export class CreateUserDto {
         example: '123 Main St, Anytown, USA',
     })
     @IsString()
+    @IsOptional()
+    @Transform(({ value }) => value === '' ? undefined : value)
     address?: string;
 
     @ApiProperty({

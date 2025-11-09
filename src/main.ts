@@ -43,11 +43,17 @@ async function bootstrap() {
     db: process.env.DB_DATABASE,
   });
   app.enableCors({
-    origin: [
-      process.env.CLIENT_URL,
-      process.env.APP_URL,
-    ],
-    credentials: true,
+    origin: (origin, callback) => {
+      const allowedOrigins = ['http://localhost:3000', 'http://localhost:4000'];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // cho phép
+      } else {
+        callback(new Error('Not allowed by CORS')); // từ chối
+      }
+    },
+    credentials: true, // nếu có dùng cookie hoặc auth headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   });
   await app.listen(process.env.PORT ?? 4000);
   console.log(`🚀 Server đang chạy tại: http://localhost:${process.env.PORT ?? 4000}`);
