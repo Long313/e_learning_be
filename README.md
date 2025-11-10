@@ -10,12 +10,12 @@
 
 
 ## ⚙️ Hướng dẫn chạy project:
- 🔹 Chạy bằng Docker:
+ 🔹 Cách 1: Chạy bằng Docker:
     1. Tải Docker Desktop https://www.docker.com/products/docker-desktop/
     2. Tạo 2 file docker-compose.yml và Dockerfile
     3. Chạy lệnh: docker-compose up --build 
   ------------------------------------------------
- 🔹 Chạy thủ công (local)
+ 🔹 Cách 2: Chạy thủ công (local)
     1. npm install
     2. Kết nối với Postgres (thông tin database ở file .env)
     3. npm run start:dev
