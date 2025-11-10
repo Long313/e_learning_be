@@ -85,7 +85,7 @@ export class AuthController {
     if (result.success) {
       return res.redirect(HttpStatus.FOUND, `${process.env.CLIENT_SUCCESS_URL}`);
     }
-    return res.redirect(HttpStatus.FOUND, `${process.env.APP_URL}`);
+    return res.redirect(HttpStatus.FOUND, `${process.env.CLIENT_URL}`);
   }
 
   @Post('resend-activation')
