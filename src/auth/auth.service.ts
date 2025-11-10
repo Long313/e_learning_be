@@ -35,6 +35,7 @@ export class AuthService {
         return {
             accessToken: await this.jwtService.signAsync(payload),
             refreshToken,
+            user: this.userService.getProfile(user.id)
         };
     }
 
@@ -60,26 +61,47 @@ export class AuthService {
     }
 
     async validateActiveToken(token?: string) {
-        if (!token) throw new BadRequestException('Missing token');
+        if (!token) {
+            return {
+                success: false,
+                message: 'Thiếu token',
+                error: 'MISSING_TOKEN',
+            }
+        }
 
         let payload: any;
         try {
             payload = this.jwtService.verify(token, { secret: process.env.JWT_ACTIVATION_SECRET });
         } catch {
-            throw new BadRequestException('Invalid or expired token');
+            return {
+                success: false,
+                message: 'Token không hợp lệ hoặc đã hết hạn',
+                error: 'INVALID_OR_EXPIRED_TOKEN',
+            }
         }
 
         if (payload.typ !== 'activation' || !payload.sub) {
-            throw new BadRequestException('Invalid token payload');
+            return {
+                success: false,
+                message: 'Payload token không hợp lệ',
+                error: 'INVALID_TOKEN_PAYLOAD',
+            }
         }
 
         const user = await this.userService.findById(payload.sub);
         if (!user) throw new NotFoundException('User not found');
 
-        if (user.status === 'active') throw new BadRequestException('User is already verified');
+        if (user.status === 'active') return {
+            success: false,
+            message: 'Người dùng đã được xác minh',
+            error: 'USER_ALREADY_VERIFIED',
+        };
 
         await this.userService.updateUserInfo(user.id, { status: 'active' });
-        return { message: 'Account activated successfully' };
+        return {
+            success: true,
+            message: 'Tài khoản đã được kích hoạt thành công',
+        };
     }
 
     async resendActivationEmail(email: string) {
