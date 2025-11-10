@@ -9,6 +9,7 @@ export class StudentResponseDto extends BaseUserResponseDto {
         description: 'Current school grade',
         example: 10,
     })
+    @Transform(({ obj }) => obj.student?.schoolGrade)
     @Expose()
     currentGrade: number;
 
@@ -16,6 +17,7 @@ export class StudentResponseDto extends BaseUserResponseDto {
         description: 'Starting date of the student',
         example: '2020-09-01T00:00:00.000Z',
     })
+    @Transform(({ obj }) => obj.student?.startDate)
     @Type(() => Date)
     @Expose()
     startDate: Date;

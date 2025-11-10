@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException, UnauthorizedException, Res } from '@nestjs/common';
+import { Body, Controller, Post, Query, UseGuards, Get, BadRequestException, UnauthorizedException, Res, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { changePasswordDto, LoginDto } from './dto/login.dto';
@@ -80,8 +80,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Token is valid, user is verified.' })
   @ApiOperation({ summary: 'Check active token from activation link' })
   @Public()
-  async active(@Query('token') token?: string) {
-    return this.authService.validateActiveToken(token);
+  async active(@Res() res: Response, @Query('token') token?: string) {
+    const result = await this.authService.validateActiveToken(token);
+    if (result.success) {
+      return res.redirect(HttpStatus.FOUND, `${process.env.CLIENT_SUCCESS_URL}`);
+    }
+    return res.redirect(HttpStatus.FOUND, `${process.env.APP_URL}`);
   }
 
   @Post('resend-activation')

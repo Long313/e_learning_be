@@ -77,10 +77,10 @@ export class StaffService {
                 relations: ['staff', 'staff.teacher', 'staff.teacher.branch' , 'staff.branchManager', 'staff.branchManager.branch', 'staff.studentManagement', 'staff.studentManagement.branch'],
             });
 
+            this.userService.sendActivationEmail(user);
             return userWithRelations;
         });
     }
-
     private async createTeacher(createStaffDto: CreateStaffDto, staff: Staff, manager: EntityManager, course: Course, branch: Branch) {
         const createTeacherDto: CreateTeacherDto = {
             major: createStaffDto.major,
