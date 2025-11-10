@@ -44,7 +44,7 @@ async function bootstrap() {
   });
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = ['http://localhost:3000', 'http://localhost:4000'];
+      const allowedOrigins = [process.env.CLIENT_URL, process.env.APP_URL];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true); // cho phép
       } else {
