@@ -35,7 +35,7 @@ export class AuthService {
         return {
             accessToken: await this.jwtService.signAsync(payload),
             refreshToken,
-            user: this.userService.getProfile(user.id)
+            user: await this.userService.getProfile(user.id)
         };
     }
 

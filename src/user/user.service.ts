@@ -108,23 +108,11 @@ export class UserService {
         }
 
         if (user.userType === 'student') {
-            const student = user.student;
-            const userWithoutStudent = Object.assign(new User(), user);
-            return plainToInstance(
-                StudentResponseDto,
-                { ...student, user: userWithoutStudent },
-                { excludeExtraneousValues: true },
-            );
+            return plainToInstance( StudentResponseDto, user , { excludeExtraneousValues: true });
         }
 
         if (user.userType === 'staff') {
-            const staff = user.staff;
-            const userWithoutStaff = Object.assign(new User(), user);
-            return plainToInstance(
-                StaffResponseDto,
-                { ...staff, user: userWithoutStaff },
-                { excludeExtraneousValues: true },
-            );
+            return plainToInstance( StaffResponseDto, user , { excludeExtraneousValues: true });
         }
     }
 
