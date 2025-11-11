@@ -15,17 +15,19 @@ export class Teacher {
 
     @Column({
         type: 'enum',
-        enum: ACADEMIC_TITLES
+        enum: ACADEMIC_TITLES,
+        nullable: true
     })
     academicTitle: string | null;
 
-    @Column({   
+    @Column({
         type: 'enum',
-        enum: DEGREES
+        enum: DEGREES,
+        nullable: true
     })
     degree: string;
 
-    @OneToOne(() => Staff, staff => staff.teacher , { onDelete: 'CASCADE' })
+    @OneToOne(() => Staff, staff => staff.teacher, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'staffId' })
     staff: Staff;
 
@@ -34,9 +36,9 @@ export class Teacher {
 
     @ManyToMany(() => Course, course => course.teachers)
     @JoinTable({
-      name: 'teacher_courses',
-      joinColumn: { name: 'teacher_id', referencedColumnName: 'id' },
-      inverseJoinColumn: { name: 'course_id', referencedColumnName: 'id' },
+        name: 'teacher_courses',
+        joinColumn: { name: 'teacher_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'course_id', referencedColumnName: 'id' },
     })
     courses: Course[];
 
