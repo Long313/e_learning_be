@@ -80,7 +80,10 @@ export class StudentService {
     const page = paginationDto.page ?? 1;
     const limit = paginationDto.limit ?? 10;
     const queryBuilder = this.userRepository.createQueryBuilder('user')
-      .leftJoinAndSelect('user.student', 'student');
+      .leftJoinAndSelect('user.student', 'student')
+      .leftJoinAndSelect('student.branch', 'branch')
+      .leftJoinAndSelect('student.courseRegistrations', 'courseRegistrations')
+      .leftJoinAndSelect('courseRegistrations.course', 'course');
 
     const result = await paginate<User>(queryBuilder, { page, limit });
 

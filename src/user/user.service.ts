@@ -102,7 +102,7 @@ export class UserService {
 
     async getProfile(userId: number) {
         
-        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch'] });
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch', 'student.branch', 'staff.teacher.branch', 'student.courseRegistrations', 'student.courseRegistrations.course'] });
         if (!user) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
