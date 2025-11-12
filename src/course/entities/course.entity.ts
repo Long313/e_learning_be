@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, ManyToOne, JoinColumn, PrimaryGeneratedColum
 import { PrerequisiteCourse } from "./prerequisite-course.entity";
 import { BaseEntity } from "src/common/entities/base.entity";
 import { Teacher } from "src/teacher/entities/teacher.entity";
+import { Student } from "src/student/entities/student.entity";
 
 
 @Entity('courses')
@@ -26,6 +27,7 @@ export class Course extends BaseEntity {
 
     @ManyToMany(() => Teacher, teacher => teacher.courses)
     teachers: Teacher[];
+    
 
     @OneToMany(() => PrerequisiteCourse, prerequisiteCourse => prerequisiteCourse.course)
     prerequisiteCourses: PrerequisiteCourse[];
