@@ -35,7 +35,7 @@ export class CreateStaffDto extends CreateUserDto {
     @IsNotEmpty()
     major: string;
 
-    @ApiProperty({ required: false, enum: ACADEMIC_TITLES })
+    @ApiProperty({ required: false, enum: ACADEMIC_TITLES, nullable: true })
     @IsEnum(
         ACADEMIC_TITLES,
         { message: `academicTitle must be one of the following values: ${Object.values(ACADEMIC_TITLES).filter(v => typeof v === 'string').join(', ')}` }
@@ -64,6 +64,6 @@ export class CreateStaffDto extends CreateUserDto {
 
     @ApiProperty({ required: false })
     @ValidateIf(o => o.staffType === 'teacher')
-    @IsNotEmpty()
+    @IsOptional()
     courseCode: string;
 }

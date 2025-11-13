@@ -1,5 +1,6 @@
 import { Exclude, Expose, Type, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Branch } from 'src/branch/entities/branch.entity';
 
 @Exclude()
 export abstract class BaseUserResponseDto {
@@ -97,4 +98,8 @@ export abstract class BaseUserResponseDto {
     @Type(() => Date)
     @Expose()
     updatedAt: Date;
+
+    @Expose()
+    @Transform(({ obj }) => obj.student?.branch || obj.staff?.teacher?.branch || obj.staff?.branchManager?.branch)
+    branch: Branch;
 }

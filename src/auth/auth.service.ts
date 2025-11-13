@@ -35,13 +35,14 @@ export class AuthService {
         return {
             accessToken: await this.jwtService.signAsync(payload),
             refreshToken,
+            user: await this.userService.getProfile(user.id)
         };
     }
 
     async refreshAccessToken(refreshToken: string) {
         try {
-            const token = await this.userService.checkRefreshToken(refreshToken);
-            if (!token) throw new UnauthorizedException('Invalid refresh token');
+            const user = await this.userService.checkRefreshToken(refreshToken);
+            if (!user) throw new UnauthorizedException('Invalid refresh token');
 
             const decoded = this.jwtService.verify(refreshToken);
             const accessPayload = { sub: decoded.sub, email: decoded.email, userType: decoded.userType };
@@ -54,32 +55,63 @@ export class AuthService {
         }
     }
 
-    async revokeRefreshToken(userId: number) {
-        await this.userService.updateRefreshToken(userId, '');
+    async revokeRefreshToken(refreshToken: string) {
+        if (!refreshToken) {
+            throw new BadRequestException('Refresh token is required');
+        }
+
+        const user = await this.userService.checkRefreshToken(refreshToken);
+        if (!user) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+
+        const userId = user.id;
+        await this.userService.updateRefreshToken(userId, null);
         return { message: 'Refresh token revoked successfully' };
     }
 
     async validateActiveToken(token?: string) {
-        if (!token) throw new BadRequestException('Missing token');
+        if (!token) {
+            return {
+                success: false,
+                message: 'Thiếu token',
+                error: 'MISSING_TOKEN',
+            }
+        }
 
         let payload: any;
         try {
             payload = this.jwtService.verify(token, { secret: process.env.JWT_ACTIVATION_SECRET });
         } catch {
-            throw new BadRequestException('Invalid or expired token');
+            return {
+                success: false,
+                message: 'Token không hợp lệ hoặc đã hết hạn',
+                error: 'INVALID_OR_EXPIRED_TOKEN',
+            }
         }
 
         if (payload.typ !== 'activation' || !payload.sub) {
-            throw new BadRequestException('Invalid token payload');
+            return {
+                success: false,
+                message: 'Payload token không hợp lệ',
+                error: 'INVALID_TOKEN_PAYLOAD',
+            }
         }
 
         const user = await this.userService.findById(payload.sub);
         if (!user) throw new NotFoundException('User not found');
 
-        if (user.status === 'active') throw new BadRequestException('User is already verified');
+        if (user.status === 'active') return {
+            success: false,
+            message: 'Người dùng đã được xác minh',
+            error: 'USER_ALREADY_VERIFIED',
+        };
 
         await this.userService.updateUserInfo(user.id, { status: 'active' });
-        return { message: 'Account activated successfully' };
+        return {
+            success: true,
+            message: 'Tài khoản đã được kích hoạt thành công',
+        };
     }
 
     async resendActivationEmail(email: string) {

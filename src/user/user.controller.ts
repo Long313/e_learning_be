@@ -18,7 +18,7 @@ export class UserController {
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     async getProfile(@CurrentUser() user) {
         if (!user) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('User not authenticated');
         }
         return this.userService.getProfile(user.userId);
     }

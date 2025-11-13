@@ -20,6 +20,7 @@ export class StudentService {
     private userService: UserService, 
     private parentService: ParentService,
     @InjectRepository(Student) private studentRepository: Repository<Student>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private dataSource: DataSource,
   ) {}
 
@@ -78,10 +79,13 @@ export class StudentService {
   async findAll(paginationDto: PaginationDto) {
     const page = paginationDto.page ?? 1;
     const limit = paginationDto.limit ?? 10;
-    const queryBuilder = this.studentRepository.createQueryBuilder('student')
-      .leftJoinAndSelect('student.user', 'user');
+    const queryBuilder = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.student', 'student')
+      .leftJoinAndSelect('student.branch', 'branch')
+      .leftJoinAndSelect('student.courseRegistrations', 'courseRegistrations')
+      .leftJoinAndSelect('courseRegistrations.course', 'course');
 
-    const result = await paginate<Student>(queryBuilder, { page, limit });
+    const result = await paginate<User>(queryBuilder, { page, limit });
 
     return {
       ...result,
@@ -90,9 +94,9 @@ export class StudentService {
   }
 
   async findOne(id: number) {
-    const result = await this.studentRepository.findOne({
-      where: { id },
-      relations: ['user'],
+    const result = await this.userRepository.findOne({
+      where: { student: { id } },
+      relations: ['student'],
     });
     if (!result) {
       throw new NotFoundException(`Student with ID ${id} not found`);

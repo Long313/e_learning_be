@@ -92,8 +92,13 @@ export class UserService {
         return this.updateUserInfo(id, updateDto);
     }
 
-    async updateRefreshToken(userId: number, refreshToken: string) {
-        await this.userRepository.update(userId, { refreshToken });
+    async updateRefreshToken(userId: number, refreshToken: string | null) {
+        await this.userRepository
+            .createQueryBuilder()
+            .update(User)
+            .set({ refreshToken: refreshToken as any }) // null hợp lệ
+            .where("id = :id", { id: userId })
+            .execute();
     }
 
     async checkRefreshToken(refreshToken: string) {
@@ -101,30 +106,18 @@ export class UserService {
     }
 
     async getProfile(userId: number) {
-        
-        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch'] });
+
+        const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['student', 'staff', 'staff.teacher', 'staff.branchManager', 'staff.branchManager.branch', 'student.branch', 'staff.teacher.branch', 'student.courseRegistrations', 'student.courseRegistrations.course'] });
         if (!user) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
         if (user.userType === 'student') {
-            const student = user.student;
-            const userWithoutStudent = Object.assign(new User(), user);
-            return plainToInstance(
-                StudentResponseDto,
-                { ...student, user: userWithoutStudent },
-                { excludeExtraneousValues: true },
-            );
+            return plainToInstance(StudentResponseDto, user, { excludeExtraneousValues: true });
         }
 
         if (user.userType === 'staff') {
-            const staff = user.staff;
-            const userWithoutStaff = Object.assign(new User(), user);
-            return plainToInstance(
-                StaffResponseDto,
-                { ...staff, user: userWithoutStaff },
-                { excludeExtraneousValues: true },
-            );
+            return plainToInstance(StaffResponseDto, user, { excludeExtraneousValues: true });
         }
     }
 
