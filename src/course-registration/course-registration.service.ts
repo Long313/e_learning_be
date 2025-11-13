@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { VIEW_STUDENT_COURSE_REGISTRATION_ROLES } from 'src/constants/course.constant';
+import { Class } from 'src/class/entities/class.entity';
 
 @Injectable()
 export class CourseRegistrationService {
@@ -48,6 +49,18 @@ export class CourseRegistrationService {
     }
 
     return registration;
+  }
+
+  async assignToClass(registrationId: number, classEntity: Class) {
+    const registration = await this.courseRegistrationRepository.findOne({
+      where: { id: registrationId, isAssigned: false },
+    });
+    if (!registration) {
+      throw new NotFoundException(`Course registration with ID ${registrationId} not found or assigned`);
+    }
+    registration.class = classEntity;
+    registration.isAssigned = true;
+    return this.courseRegistrationRepository.save(registration);
   }
 
   update(id: number, updateCourseRegistrationDto: UpdateCourseRegistrationDto) {

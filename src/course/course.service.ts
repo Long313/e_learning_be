@@ -77,4 +77,15 @@ export class CourseService {
     }
     return this.courseRepository.delete(id);
   }
+
+  async findOneByCode(code: string) {
+    const course =  await this.courseRepository.findOne({
+      where: { code },
+      relations: ['prerequisiteCourses'],
+    });
+    if (!course) {
+      throw new Error(`Course with code ${code} not found`);
+    }
+    return course;
+  }
 }

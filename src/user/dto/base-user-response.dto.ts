@@ -73,6 +73,7 @@ export abstract class BaseUserResponseDto {
         example: ['student'],
         type: [String],
     })
+    @Transform(({ obj }) => obj.roles)
     @Expose()
     roles: string[];
 

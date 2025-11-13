@@ -7,4 +7,7 @@ const removeUndefinedFields = <T extends object>(obj: T): Partial<T> => {
         }, {} as Partial<T>);
 };
 
-export { removeUndefinedFields };
+const snakeToCamel = (s: string) => s.replace(/_([a-z0-9])/g, (_, c: string) => c.toUpperCase());
+
+
+export { removeUndefinedFields, snakeToCamel };

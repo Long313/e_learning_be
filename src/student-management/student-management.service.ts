@@ -17,9 +17,9 @@ export class StudentManagementService {
     async findAll(page:number = 1, limit:number = 10, filters: StudentManagerFilters = {}) {
         const queryBuilder = this.userRepository.createQueryBuilder('user')
             .leftJoinAndSelect('user.staff', 'staff')
-            .leftJoinAndSelect('staff.studentManager', 'studentManager')
-            .leftJoinAndSelect('studentManager.branch', 'branch')
-            .where('studentManager.id IS NOT NULL')
+            .leftJoinAndSelect('staff.studentManagement', 'studentManagement')
+            .leftJoinAndSelect('studentManagement.branch', 'branch')
+            .where('studentManagement.id IS NOT NULL')
             .orderBy('user.createdAt', 'DESC');
 
         if (filters.branchId) {
@@ -37,8 +37,8 @@ export class StudentManagementService {
 
     async findOne(id: number) {
         const user = await this.userRepository.findOne({
-            where: { id },
-            relations: ['staff', 'staff.studentManager', 'staff.studentManager.branch'],
+            where: { staff: { studentManagement: { id } } },
+            relations: ['staff', 'staff.studentManagement', 'staff.studentManagement.branch'],
         });
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
@@ -49,7 +49,7 @@ export class StudentManagementService {
     async update(id: number, updateDto: UpdateStudentManagementDto) {
         const result = await this.userRepository.manager.transaction(async (manager) => {
             const user = await manager.findOne(User, {
-                where: { id },
+                where: { staff: { studentManagement: { id } } },
                 relations: ['staff', 'staff.studentManager'],
             });
             if (!user) {
@@ -68,8 +68,8 @@ export class StudentManagementService {
             await manager.update(User, id, userDto);
 
             return await manager.findOne(User, {
-                where: { id },
-                relations: ['staff', 'staff.studentManager', 'staff.studentManager.branch'],
+                where: { staff: { studentManagement: { id } } },
+                relations: ['staff', 'staff.studentManagement', 'staff.studentManagement.branch'],
             });
         });
         return plainToInstance(StaffResponseDto, result, { excludeExtraneousValues: true });

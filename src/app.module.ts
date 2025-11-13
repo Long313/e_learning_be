@@ -16,6 +16,7 @@ import { CourseModule } from './course/course.module';
 import { AdminModule } from './admin/admin.module';
 import { CourseRegistrationModule } from './course-registration/course-registration.module';
 import { StudentManagementModule } from './student-management/student-management.module';
+import { ClassModule } from './class/class.module';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { StudentManagementModule } from './student-management/student-management
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      dropSchema: true,
+      // dropSchema: true,
       synchronize: true,
       autoLoadEntities: true,
       retryAttempts: 10,
@@ -53,6 +54,7 @@ import { StudentManagementModule } from './student-management/student-management
     AdminModule,
     CourseRegistrationModule,
     StudentManagementModule,
+    ClassModule,
   ],
   providers: [
     {
