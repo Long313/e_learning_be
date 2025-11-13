@@ -64,6 +64,6 @@ export class CreateStaffDto extends CreateUserDto {
 
     @ApiProperty({ required: false })
     @ValidateIf(o => o.staffType === 'teacher')
-    @IsNotEmpty()
+    @IsOptional()
     courseCode: string;
 }

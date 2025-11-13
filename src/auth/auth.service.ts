@@ -66,7 +66,7 @@ export class AuthService {
         }
 
         const userId = user.id;
-        await this.userService.updateRefreshToken(userId, '');
+        await this.userService.updateRefreshToken(userId, null);
         return { message: 'Refresh token revoked successfully' };
     }
 
