@@ -41,8 +41,8 @@ export class AuthService {
 
     async refreshAccessToken(refreshToken: string) {
         try {
-            const token = await this.userService.checkRefreshToken(refreshToken);
-            if (!token) throw new UnauthorizedException('Invalid refresh token');
+            const user = await this.userService.checkRefreshToken(refreshToken);
+            if (!user) throw new UnauthorizedException('Invalid refresh token');
 
             const decoded = this.jwtService.verify(refreshToken);
             const accessPayload = { sub: decoded.sub, email: decoded.email, userType: decoded.userType };
@@ -55,7 +55,17 @@ export class AuthService {
         }
     }
 
-    async revokeRefreshToken(userId: number) {
+    async revokeRefreshToken(refreshToken: string) {
+        if (!refreshToken) {
+            throw new BadRequestException('Refresh token is required');
+        }
+
+        const user = await this.userService.checkRefreshToken(refreshToken);
+        if (!user) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+
+        const userId = user.id;
         await this.userService.updateRefreshToken(userId, '');
         return { message: 'Refresh token revoked successfully' };
     }

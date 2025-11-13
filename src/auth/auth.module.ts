@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -21,8 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        const env = configService.get<string>('NODE_ENV', 'development');
-        const expiresIn = env === 'production' ? '5m' : '24h';
+        const expiresIn = '5m';
         
         return {
           global: true,
@@ -33,9 +32,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         };
       },
     }),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
-  exports: [JwtModule, PassportModule, JwtAuthGuard],
+  exports: [JwtModule, PassportModule, JwtAuthGuard, AuthService],
     
 })
 export class AuthModule {}

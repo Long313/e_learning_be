@@ -1,8 +1,8 @@
 import { Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn, Column } from 'typeorm';
 import { Student } from 'src/student/entities/student.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { COURSE_REGISTRATION_TUITION_STATUS } from 'src/constants/course.constant';
-import type { CourseRegistrationTuitionStatusType } from 'src/constants/course.constant';
+import { COURSE_REGISTRATION_TUITION_STATUS, COURSE_STATUS } from 'src/constants/course.constant';
+import type { CourseRegistrationTuitionStatusType, CourseStatusType } from 'src/constants/course.constant';
 
 @Entity('course_registrations')
 
@@ -20,4 +20,7 @@ export class CourseRegistration {
 
   @Column({ type: 'enum', enum: COURSE_REGISTRATION_TUITION_STATUS })
   tuitionStatus: CourseRegistrationTuitionStatusType;
+
+  @Column({ type: 'enum', enum: COURSE_STATUS, default: 'upcoming' })
+  status: CourseStatusType;
 }

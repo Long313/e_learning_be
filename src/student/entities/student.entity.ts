@@ -1,7 +1,9 @@
 import { Branch } from 'src/branch/entities/branch.entity';
+import { CourseRegistration } from 'src/course-registration/entities/course-registration.entity';
+import { Course } from 'src/course/entities/course.entity';
 import { Parent } from 'src/parent/entities/parent.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, AfterInsert, AfterUpdate, JoinColumn, OneToMany, ManyToOne, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity('students')
 
@@ -27,6 +29,17 @@ export class Student {
 
     @ManyToOne(() => Branch, branch => branch.students, { onDelete: 'SET NULL' })
     branch: Branch | null;
+
+    @OneToMany(() => CourseRegistration, courseRegistration => courseRegistration.student)
+    courseRegistrations: CourseRegistration[];
+
+    get courses(): Course[] {
+        if (this.courseRegistrations && this.courseRegistrations.length > 0) {
+            return this.courseRegistrations.map(cr => cr.course);
+        }
+        return [];
+    }
+
 
     @AfterInsert()
     logInsert() {
