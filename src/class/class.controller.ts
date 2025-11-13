@@ -13,22 +13,22 @@ export class ClassController {
   }
 
   @Get()
-  findAll() {
-    return this.classService.findAll();
+  findAll(@Param('courseCode') courseCode?: string) {
+    return this.classService.findAll(courseCode);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.classService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.classService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassDto: UpdateClassDto) {
-    return this.classService.update(+id, updateClassDto);
+  update(@Param('id') id: number, @Body() updateClassDto: UpdateClassDto) {
+    return this.classService.update(id, updateClassDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.classService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.classService.remove(id);
   }
 }

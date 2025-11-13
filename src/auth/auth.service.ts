@@ -26,7 +26,7 @@ export class AuthService {
         const passwordMatch = await this.comparePassword(user.password, password);
         if (!passwordMatch) throw new UnauthorizedException('Invalid email or password');
 
-        const roles = user.getRoles();
+        const roles = user.roles;
         const payload = { sub: user.id, email: user.email, roles };
         const refreshToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 

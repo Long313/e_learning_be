@@ -5,6 +5,10 @@ import { BaseUserResponseDto } from 'src/user/dto/base-user-response.dto';
 
 @Exclude()
 export class TeacherInfoDto {
+    @ApiProperty({ description: 'Teacher ID', example: 1 })
+    @Expose()
+    id: number;
+
     @ApiProperty({ description: 'Major', example: 'Computer Science' })
     @Expose()
     major: string;
@@ -24,6 +28,10 @@ export class TeacherInfoDto {
 
 @Exclude()
 export class BranchManagerInfoDto {
+    @ApiProperty({ description: 'Branch manager ID', example: 1 })
+    @Expose()
+    branchId: number;
+
     @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
     @Expose()
     branchName: string;
@@ -31,6 +39,10 @@ export class BranchManagerInfoDto {
 
 @Exclude()
 export class StudentManagementInfoDto {
+    @ApiProperty({ description: 'Student management ID', example: 1 })
+    @Expose()
+    id: number;
+
     @ApiProperty({ description: 'Branch name', example: 'Branch Name' })
     @Expose()
     branchName: string;
@@ -48,6 +60,7 @@ export class StaffResponseDto extends BaseUserResponseDto {
     @Transform(({ obj }) => {
         if (obj.staff?.teacher && obj.staff?.teacher?.branch) {
             return {
+                id: obj.staff.teacher.id,
                 major: obj.staff.teacher.major,
                 academic_title: obj.staff.teacher.academicTitle,
                 degree: obj.staff.teacher.degree,
@@ -68,7 +81,7 @@ export class StaffResponseDto extends BaseUserResponseDto {
     @Transform(({ obj }) => {
         if (obj.staff?.branchManager && obj.staff?.branchManager?.branch) {
             return {
-                branchId: obj.staff.branchManager.branch.id,
+                id: obj.staff.branchManager.id,
                 branchName: obj.staff.branchManager.branch.name,
             };
         }
@@ -86,6 +99,7 @@ export class StaffResponseDto extends BaseUserResponseDto {
     @Transform(({ obj }) => {
         if (obj.staff?.studentManagement && obj.staff?.studentManagement?.branch) {
             return {
+                id: obj.staff.studentManagement.id,
                 branchName: obj.staff.studentManagement.branch.name,
             };
         }

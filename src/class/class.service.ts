@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,16 +23,25 @@ export class ClassService {
     const courseRegistrationIds = createClassDto.courseRegistrationIds;
 
     const course = await this.courseService.findOneByCode(courseCode);
-    const teacher = await this.teacherService.findById(teacherId);
+    const teacher = await this.teacherService.findByIdAndReturnTeacherEntity(teacherId);
+    if (teacher.courses.every((t_course) => t_course.code !== courseCode)) {
+      throw new Error(`Teacher with ID ${teacherId} does not teach course with code ${courseCode}`);
+    }
     const classEntity = this.classRepository.create({
       ...createClassDto,
       course: course,
       teacher: teacher,
     });
-    courseRegistrationIds.forEach(async (registrationId) => {
-      await this.courseRegistrationService.assignToClass(registrationId, classEntity);
-    });
     const saved_class = await this.classRepository.save(classEntity);
+
+  try {
+    for (const registrationId of courseRegistrationIds ?? []) {
+      await this.courseRegistrationService.assignToClass(registrationId, saved_class);
+    }
+  } catch (error) {
+    await this.classRepository.delete(saved_class.id); // rollback lớp vừa tạo
+    throw new BadRequestException(error?.message || 'Assign registration failed'); // PHẢI throw
+  }
     return this.classRepository.findOne({
       where: { id: saved_class.id },
     });

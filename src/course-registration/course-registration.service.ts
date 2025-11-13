@@ -56,7 +56,7 @@ export class CourseRegistrationService {
       where: { id: registrationId, isAssigned: false },
     });
     if (!registration) {
-      throw new NotFoundException(`Course registration with ID ${registrationId} not found`);
+      throw new NotFoundException(`Course registration with ID ${registrationId} not found or assigned`);
     }
     registration.class = classEntity;
     registration.isAssigned = true;

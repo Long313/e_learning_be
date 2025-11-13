@@ -96,7 +96,10 @@ export class StudentService {
   async findOne(id: number) {
     const result = await this.userRepository.findOne({
       where: { student: { id } },
-      relations: ['student'],
+      relations: ['student', 'student.branch', 
+        'student.courseRegistrations.class', 'student.courseRegistrations.class.course', 
+        'student.courseRegistrations.class.teacher.staff.user', 'student.courseRegistrations', 
+        'student.courseRegistrations.course'],
     });
     if (!result) {
       throw new NotFoundException(`Student with ID ${id} not found`);
@@ -110,7 +113,15 @@ export class StudentService {
       throw new NotFoundException(`Student with user ID ${userId} not found`);
     }
     const studentId = student.id;
-    await this.userService.updateUserInfo(userId, updateStudentDto);
+    const updateUserDto = removeUndefinedFields<UpdateStudentDto>({
+      fullName: updateStudentDto.fullName,
+      gender: updateStudentDto.gender,
+      dateOfBirth: updateStudentDto.dateOfBirth,
+      phoneNumber: updateStudentDto.phoneNumber,
+      address: updateStudentDto.address,
+      avatarUrl: updateStudentDto.avatarUrl,
+    });
+    await this.userService.updateUserInfo(userId, updateUserDto);
     const updateDto = removeUndefinedFields<UpdateStudentDto>({
       schoolGrade: updateStudentDto.schoolGrade,
       startDate: updateStudentDto.startDate,

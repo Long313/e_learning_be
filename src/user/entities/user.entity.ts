@@ -1,9 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterRemove, AfterUpdate, OneToOne, JoinColumn, OneToMany, ManyToOne } from 'typeorm';
-import { USER_TYPES, GENDERS, STATUS, AssociatedEntity, ROLES_MAP} from '../../constants/user.constant';
+import { USER_TYPES, GENDERS, STATUS, AssociatedEntity, ROLES_MAP, STAFF_TYPES} from '../../constants/user.constant';
 import { Student } from 'src/student/entities/student.entity';
 import { Exclude } from 'class-transformer';
 import { Staff } from 'src/staff/entities/staff.entity';
 import { Admin } from 'src/admin/entities/admin.entity';
+import { snakeToCamel } from 'src/common/helpers';
 @Entity('users')
 export class User {
 
@@ -113,33 +114,33 @@ export class User {
     }
 
 
-    // Custom Methods
+    // Getter Methods
 
-    getAge(): number {
+    get age(): number {
         const currentYear = new Date().getFullYear();
         return currentYear - this.dateOfBirth.getFullYear();
     }
 
-    getRoles(): string[] {
+    get roles(): string[] {
         if (['student', 'admin'].includes(this.userType)) {
             return [ROLES_MAP[this.userType]];
         }
         if (this.userType === 'staff') {
             const roles: string[] = [];
-            if (this.staff) {
-                if (this.staff.teacher) {
-                    roles.push(ROLES_MAP['teacher']);
-                }
-                if (this.staff.branchManager) {
-                    roles.push(ROLES_MAP['branch_manager']);
-                }
+            const staff = this.staff;
+            if (staff) {
+                STAFF_TYPES.forEach(type => {
+                    if ((staff as any)[snakeToCamel(type)]) {
+                        roles.push(ROLES_MAP[type]);
+                    }
+                });
             }
             return roles;
         }
         return []
     }
 
-    getAssociatedEntity(): AssociatedEntity {
+    get associatedEntity(): AssociatedEntity {
         if (this.userType === 'student') {
             return this.student; 
         } else if (this.userType === 'staff') {

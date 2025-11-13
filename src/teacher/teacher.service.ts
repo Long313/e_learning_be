@@ -53,10 +53,21 @@ export class TeacherService {
         return plainToInstance(StaffResponseDto, user, { excludeExtraneousValues: true });
     }
 
+    async findByIdAndReturnTeacherEntity(id: number) {
+        const teacher = await this.teacherRepository.findOne({
+            where: { id },
+            relations: ['staff', 'branch', 'courses'],
+        });
+        if (!teacher) {
+            throw new NotFoundException(`Teacher with ID ${id} not found`);
+        }
+        return teacher;
+    }
+
     async update(id: number, updateTeacherDto: UpdateTeacherDto) {
         const result = await this.userRepository.manager.transaction(async (manager) => {
             const user = await manager.findOne(User, {
-            where: { id },
+            where: { staff: { teacher: { id: id } } },
             relations: ['staff', 'staff.teacher'],
         });
         if (!user || !user.staff?.teacher) {
@@ -81,7 +92,7 @@ export class TeacherService {
         await manager.update(Teacher, user.staff.teacher.id, teacherDto);
 
         const updatedUser = await manager.findOne(User, {
-            where: { id },
+            where: { staff: { teacher: { id: id } } },
             relations: ['staff', 'staff.teacher', 'staff.teacher.branch'],
         });
         return updatedUser;
