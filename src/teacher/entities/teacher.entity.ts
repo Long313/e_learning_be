@@ -1,8 +1,9 @@
-import { Column, OneToOne, JoinColumn, Entity, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, ManyToOne, ManyToMany, JoinTable } from "typeorm";
+import { Column, OneToOne, JoinColumn, Entity, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, ManyToOne, ManyToMany, JoinTable, OneToMany } from "typeorm";
 import { ACADEMIC_TITLES, DEGREES } from "src/constants/user.constant";
 import { Staff } from "src/staff/entities/staff.entity";
 import { Branch } from "src/branch/entities/branch.entity";
 import { Course } from "src/course/entities/course.entity";
+import { Class } from "src/class/entities/class.entity";
 
 
 @Entity('teachers')
@@ -41,6 +42,9 @@ export class Teacher {
         inverseJoinColumn: { name: 'course_id', referencedColumnName: 'id' },
     })
     courses: Course[];
+
+    @OneToMany(() => Class, clss => clss.teacher)
+    classes: Class[];
 
     @AfterInsert()
     logInsert() {
